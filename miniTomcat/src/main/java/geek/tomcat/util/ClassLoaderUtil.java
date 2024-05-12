@@ -14,7 +14,7 @@ public class ClassLoaderUtil {
 
     public static void main(String[] args) throws MalformedURLException, ClassNotFoundException {
         String filePath = "/Volumes/DEV/code/TomcatStudy/miniTomcat/webroot/";
-        String className = "geek.tomcat.test.HelloServlet";
+        String className = "HelloServlet";
         Class<?> aClass = loadClassByDir(filePath, className);
         System.out.println(aClass);
     }

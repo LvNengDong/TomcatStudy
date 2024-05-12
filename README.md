@@ -6,4 +6,4 @@ Tomcat学习
 
 http://localhost:8080/hello.txt
 
-http://localhost:8080/servlet/geek.tomcat.test.HelloServlet
+http://localhost:8080/servlet/HelloServlet

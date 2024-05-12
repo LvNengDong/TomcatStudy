@@ -5,8 +5,8 @@ import geek.tomcat.util.ClassLoaderUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
+import javax.servlet.Servlet;
+import java.io.PrintWriter;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -30,16 +30,17 @@ public class ServletProcessor {
             // 加载 servlet class
             Class<?> servletClass = ClassLoaderUtil.loadClassByDir(Constants.WEB_ROOT, servletName);
 
+
+            response.setCharacterEncoding(Constants.UTF_8);
+            PrintWriter writer = response.getWriter();
+
             // 写响应头
-            OutputStream output = response.getOutput();
             String head = composeResponseHead();
-            output.write(head.getBytes(StandardCharsets.UTF_8));
+            writer.println(head);
 
             // 反射创建 servlet 实例，并执行 service() 方法
-            Servlet servlet = null;
-            servlet = (Servlet) servletClass.newInstance();
+            Servlet servlet = (Servlet) servletClass.newInstance();
             servlet.service(request, response);
-            output.flush();
         } catch (Exception e) {
             log.error("ServletProcessor process exception servletName:{}", servletName, e);
         }
