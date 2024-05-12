@@ -1,6 +1,7 @@
 package geek.tomcat.server;
 
 import geek.tomcat.util.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +11,7 @@ import java.io.InputStream;
  * @Description HTTP协议请求
  * @Date 2024/1/10 22:04
  */
+@Slf4j
 public class Request {
 
     private InputStream input;
@@ -36,7 +38,6 @@ public class Request {
             request.append((char) buffer[j]); //将byte数组转换成String字符串
         }
         uri = parseUri(request.toString());
-        Logger.info("request parse result request:{0} uri:{1}", request, uri);
     }
 
     /**

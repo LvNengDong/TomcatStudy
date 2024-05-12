@@ -2,6 +2,7 @@ package geek.tomcat.server;
 
 import geek.tomcat.Constants;
 import geek.tomcat.util.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.net.Socket;
  * @Description
  * @Date 2024/1/10 22:04
  */
+@Slf4j
 public class HttpServer {
 
 
@@ -33,11 +35,11 @@ public class HttpServer {
             ServerSocket serverSocket = new ServerSocket(Constants.SERVER_PORT, Constants.SERVER_BACK_LOG, InetAddress.getByName(Constants.SERVER_HOST));
 
             while (true) {
-                Logger.info("ServerSocket已启动，等待客户端连接请求");
+                log.info("ServerSocket已启动，等待客户端连接请求");
                 // 阻塞等待，直到有有客户端发起连接请求。
                 // 当与客户端三次握手成功后，分配给当前连接一个socket
                 Socket socket = serverSocket.accept();
-                Logger.info("ServerSocket与客户端建立连接成功，本次连接的socket为: {0}", socket);
+                log.info("ServerSocket与客户端建立连接成功，本次连接的socket为: {}", socket);
 
                 InputStream input = socket.getInputStream();
                 OutputStream output = socket.getOutputStream();
@@ -45,18 +47,28 @@ public class HttpServer {
                 // create Request object and parse
                 Request request = new Request(input);
                 request.parse();
+                log.info("客户端请求解析 uri:{}", request.getUri());
 
                 // create Response object
                 Response response = new Response(output);
                 response.setRequest(request);
-                response.sendStaticResource();
+
+                if (request.getUri().startsWith("/servlet/")) {
+                    log.info("客户端请求解析 servlet请求 uri:{}", request.getUri());
+                    ServletProcessor processor = new ServletProcessor();
+                    processor.process(request, response);
+                } else {
+                    log.info("客户端请求解析 静态文件请求 uri:{}", request.getUri());
+                    StatisticResourceProcessor processor = new StatisticResourceProcessor();
+                    processor.process(request, response);
+                }
 
                 // close the socket
                 socket.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
+            log.error("HttpServer exception", e);
+            System.exit(1); // 退出JVM进程
         }
 
     }
