@@ -1,11 +1,8 @@
 package geek.tomcat.server;
 
 import geek.tomcat.Constants;
-import geek.tomcat.util.Logger;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;

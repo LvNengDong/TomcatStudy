@@ -1,12 +1,8 @@
 package geek.tomcat.server;
 
 
-import geek.tomcat.Constants;
 import lombok.Data;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
