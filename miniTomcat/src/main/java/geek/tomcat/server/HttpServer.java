@@ -17,7 +17,7 @@ import java.net.Socket;
  * @Date 2024/1/10 22:04
  */
 public class HttpServer {
-    public static final String WEB_ROOT = System.getProperty("user.dir") + File.separator + "webroot";
+
 
     public static void main(String[] args) {
         HttpServer server = new HttpServer();
@@ -34,8 +34,10 @@ public class HttpServer {
 
             while (true) {
                 Logger.info("ServerSocket已启动，等待客户端连接请求");
-                Socket socket = serverSocket.accept(); // 阻塞等待，直到有有客户端发起连接请求
-                Logger.info("ServerSocket客户端连接请求进入");
+                // 阻塞等待，直到有有客户端发起连接请求。
+                // 当与客户端三次握手成功后，分配给当前连接一个socket
+                Socket socket = serverSocket.accept();
+                Logger.info("ServerSocket与客户端建立连接成功，本次连接的socket为: {0}", socket);
 
                 InputStream input = socket.getInputStream();
                 OutputStream output = socket.getOutputStream();
@@ -51,7 +53,6 @@ public class HttpServer {
 
                 // close the socket
                 socket.close();
-
             }
         } catch (Exception e) {
             e.printStackTrace();

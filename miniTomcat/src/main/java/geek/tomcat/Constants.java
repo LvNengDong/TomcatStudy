@@ -8,7 +8,7 @@ import java.io.File;
  * @Date 2024/5/9 22:23
  */
 public class Constants {
-    public static final String WEB_ROOT = System.getProperty("user.dir") + File.separator + "src/webroot";
+    public static final String WEB_ROOT = System.getProperty("user.dir") + File.separator + "webroot";
     public static final String WEB_SERVLET_ROOT = System.getProperty("user.dir") + File.separator + "src/webroot/test";
     public static final int BUFFER_SIZE = 1024;
     public static final String UTF_8 = "UTF-8";
