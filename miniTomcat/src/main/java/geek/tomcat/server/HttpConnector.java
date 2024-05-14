@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * @Author lnd
@@ -14,6 +16,13 @@ import java.net.Socket;
  */
 @Slf4j
 public class HttpConnector implements Runnable {
+
+    int minProcessors = 3;
+    int maxProcessors = 10;
+    int curProcessors = 0;
+    //存放多个processor的池子
+    Deque<HttpProcessor> processors = new ArrayDeque<>();
+
     @Override
     public void run() {
         try {
@@ -22,15 +31,31 @@ public class HttpConnector implements Runnable {
                     Constants.SERVER_BACK_LOG,
                     InetAddress.getByName(Constants.SERVER_HOST));
 
+            log.info("初始化processors start");
+            for (int i = 0; i < minProcessors; i++) {
+                HttpProcessor processor = new HttpProcessor();
+                processors.push(processor);
+            }
+            curProcessors = minProcessors;
+            log.info("初始化processors 当前处理器池中的处理器数量 curProcessorSize:{}", curProcessors);
+            log.info("初始化processors end");
+
             while (true) {
                 log.info("启动ServerSocket，等待客户端连接请求");
                 // 阻塞等待，直到有有客户端发起连接请求。
                 // 当与客户端三次握手成功后，分配给当前连接一个socket
                 Socket socket = serverSocket.accept();
-
                 log.info("ServerSocket与客户端建立连接成功，分配一个socket给当前连接 socket: {}", socket);
-                HttpProcessor processor = new HttpProcessor();
+                HttpProcessor processor = getProcessor();
+                if (processor == null) {
+                    log.info("获取processor失败，关闭当前连接 socket:{}", socket);
+                    socket.close();
+                    continue;
+                }
+                // 处理
                 processor.process(socket);
+                // 处理完毕后归还processor
+                processors.push(processor);
                 // close the socket
                 log.info("请求处理完毕，关闭本次连接对应的socket(非ServerSocket) socket: {}", socket);
                 socket.close();
@@ -38,6 +63,20 @@ public class HttpConnector implements Runnable {
         } catch (Exception e) {
             log.error("http connector occur exception, close JVM processor", e);
             System.exit(1); // 退出JVM进程
+        }
+    }
+
+    /**
+     * 从池子中获取一个processor，如果池子为空且小于最大限制，则新建一个
+     * @return
+     */
+    private HttpProcessor getProcessor() {
+        if (!processors.isEmpty()) { // 不为空直接取
+            return processors.pop();
+        } else if (curProcessors < maxProcessors) { // 为空&&允许创建，则创建一个
+            return new HttpProcessor();
+        } else {
+            return null;
         }
     }
 
