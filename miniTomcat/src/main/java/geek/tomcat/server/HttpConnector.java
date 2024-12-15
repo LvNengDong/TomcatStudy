@@ -2,6 +2,7 @@ package geek.tomcat.server;
 
 import geek.tomcat.Constants;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -21,7 +22,7 @@ public class HttpConnector implements Runnable {
     int maxProcessors = 10;
     int curProcessors = 0;
     //存放多个processor的池子
-    Deque<HttpProcessor> processors = new ArrayDeque<>();
+    final Deque<HttpProcessor> processors = new ArrayDeque<>();
 
     @Override
     public void run() {
@@ -33,8 +34,9 @@ public class HttpConnector implements Runnable {
 
             log.info("初始化processors start");
             for (int i = 0; i < minProcessors; i++) {
-                HttpProcessor processor = new HttpProcessor();
-                processors.push(processor);
+                HttpProcessor initProcessor = new HttpProcessor(this);
+                initProcessor.start(); // 这表明每个process一创建就会开始执行
+                processors.push(initProcessor);
             }
             curProcessors = minProcessors;
             log.info("初始化processors 当前处理器池中的处理器数量 curProcessorSize:{}", curProcessors);
@@ -52,13 +54,8 @@ public class HttpConnector implements Runnable {
                     socket.close();
                     continue;
                 }
-                // 处理
-                processor.process(socket);
-                // 处理完毕后归还processor
-                processors.push(processor);
-                // close the socket
-                log.info("请求处理完毕，关闭本次连接对应的socket(非ServerSocket) socket: {}", socket);
-                socket.close();
+                // 分配Socket给Processor
+                processor.assign(socket);
             }
         } catch (Exception e) {
             log.error("http connector occur exception, close JVM processor", e);
@@ -71,19 +68,34 @@ public class HttpConnector implements Runnable {
      * @return
      */
     private HttpProcessor getProcessor() {
-        if (!processors.isEmpty()) { // 不为空直接取
-            return processors.pop();
-        } else if (curProcessors < maxProcessors) { // 为空&&允许创建，则创建一个
-            return new HttpProcessor();
-        } else {
-            return null;
+        synchronized (processors) {
+            if (CollectionUtils.isNotEmpty(processors)) { // 不为空直接取
+                return processors.pop();
+            } else if (curProcessors < maxProcessors) { // 为空&&允许创建，则创建一个
+                return newProcessor();
+                        //new HttpProcessor();
+            } else {
+                return null;
+            }
         }
+    }
+
+    private HttpProcessor newProcessor() {
+        HttpProcessor initProcessor = new HttpProcessor(this);
+        initProcessor.start(); // 这表明每个process一创建就会开始执行
+        processors.push(initProcessor);
+        curProcessors++;
+        return processors.pop();
     }
 
     public void start() {
         // this 是一个 Runnable 任务
         Thread thread = new Thread(this);
         thread.start();
+    }
+
+    void recycle(HttpProcessor processor) {
+        processors.push(processor);
     }
 }
 
