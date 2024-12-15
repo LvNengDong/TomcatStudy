@@ -47,7 +47,7 @@ public class HttpConnector implements Runnable {
                 // 阻塞等待，直到有有客户端发起连接请求。
                 // 当与客户端三次握手成功后，分配给当前连接一个socket
                 Socket socket = serverSocket.accept();
-                log.info("ServerSocket与客户端建立连接成功，分配一个socket给当前连接 socket: {}", socket);
+                log.info("ServerSocket与客户端建立连接成功，创建一个新的socket对象给当前连接 socket: {}", socket);
                 HttpProcessor processor = getProcessor();
                 if (processor == null) {
                     log.info("获取processor失败，关闭当前连接 socket:{}", socket);
@@ -69,11 +69,10 @@ public class HttpConnector implements Runnable {
      */
     private HttpProcessor getProcessor() {
         synchronized (processors) {
-            if (CollectionUtils.isNotEmpty(processors)) { // 不为空直接取
+            if (processors.size() > 0) { // 不为空直接取
                 return processors.pop();
             } else if (curProcessors < maxProcessors) { // 为空&&允许创建，则创建一个
                 return newProcessor();
-                        //new HttpProcessor();
             } else {
                 return null;
             }
