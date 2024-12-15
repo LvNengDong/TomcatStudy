@@ -28,6 +28,7 @@ public class HttpProcessor implements Runnable {
     }
 
 
+    /* processor线程 */
     @Override
     public void run() {
         while (true) {
@@ -119,7 +120,7 @@ public class HttpProcessor implements Runnable {
         // 当processor发现没有需要处理的Socket时，就会进入阻塞状态
         while (!available) {
             try {
-                log.info("当前processor没有需要处理的Socket，进入阻塞状态 processor:{}", this);
+                log.info("当前processor没有分配到需要处理的Socket，进入阻塞状态 processor:{}", this);
                 wait(); // 阻塞
             } catch (InterruptedException e) {
                 log.info("响应中断");
@@ -127,12 +128,12 @@ public class HttpProcessor implements Runnable {
             }
         }
         // 当processor被分配到Socket后，标志位会改为true，退出循环，继续向下执行
-        log.info("当前processor被分配到了新的Socket，退出阻塞状态 processor:{} socket:{}", this, this.socket);
+        log.info("当前processor分配到了新的Socket，退出阻塞状态 processor:{} socket:{}", this, this.socket);
         // 获得这个新的Socket
         Socket socket = this.socket;
         // 重新初始化标志位，通知Connector线程可以分配新的Socket连接给Processor了
         available = false;
-        // 通知另外的线程
+        // 唤醒Connector线程，因为Connector线程在调用 assign 方法时会陷入阻塞，这里当 Socket 分配成功后，就需要马上调用 notifyAll 唤醒 Connector 线程
         notifyAll();
         return socket;
     }
