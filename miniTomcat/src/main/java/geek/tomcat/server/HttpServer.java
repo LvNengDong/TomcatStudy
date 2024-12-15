@@ -34,7 +34,7 @@ public class HttpServer {
             while (true) {
                 log.info("ServerSocket已启动，等待客户端连接请求");
                 // 阻塞等待，直到有有客户端发起连接请求。
-                // 当与客户端三次握手成功后，分配给当前连接一个socket
+                // 当与客户端三次握手成功后，为每一个连接生成一个socket
                 Socket socket = serverSocket.accept();
                 log.info("ServerSocket与客户端建立连接成功，本次连接的socket为: {}", socket);
 

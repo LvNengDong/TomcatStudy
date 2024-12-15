@@ -1,5 +1,6 @@
 package geek.tomcat.server;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 public class Request {
 
     private InputStream input;
+    @Getter
     private String uri;
 
     public Request(InputStream input) {
@@ -58,7 +60,4 @@ public class Request {
         return null;
     }
 
-    public String getUri() {
-        return uri;
-    }
 }
