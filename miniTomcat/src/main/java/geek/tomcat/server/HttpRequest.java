@@ -4,7 +4,10 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,6 +19,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class HttpRequest implements HttpServletRequest {
 
+    private InputStream input;
+    private SocketInputStream sis;
+    private String uri;
+    InetAddress address;
+    int port;
     /**
      * 存储请求头信息
      */
@@ -26,6 +34,64 @@ public class HttpRequest implements HttpServletRequest {
      */
     protected Map<String, String> parameters = new ConcurrentHashMap<>();
 
+    HttpRequestLine requestLine = new HttpRequestLine();
+
+    public HttpRequest(InputStream input) {
+        this.input = input;
+        this.sis = new SocketInputStream(this.input, 2048);
+    }
+
+    public void parse(Socket socket) {
+        try {
+            parseConnection(socket);
+            this.sis.readRequestLine(requestLine);
+            parseHeaders();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ServletException e) {
+            e.printStackTrace();
+        }
+        this.uri = new String(requestLine.uri, 0, requestLine.uriEnd);
+    }
+
+
+    private void parseConnection(Socket socket) {
+        address = socket.getInetAddress();
+        port = socket.getPort();    // 客户端端口号
+    }
+
+    private void parseHeaders() throws IOException, ServletException {
+        while (true) {
+            HttpHeader header = new HttpHeader();
+            sis.readHeader(header);
+            if (header.nameEnd == 0) {
+                if (header.valueEnd == 0) {
+                    return;
+                } else {
+                    throw new ServletException("httpProcessor.parseHeaders.colon");
+                }
+            }
+            String name = new String(header.name, 0, header.nameEnd);
+            String value = new String(header.value, 0, header.valueEnd);
+            // 设置相应的请求头
+            if (name.equals(DefaultHeaders.ACCEPT_LANGUAGE_NAME)) {
+                headers.put(name, value);
+            } else if (name.equals(DefaultHeaders.CONTENT_LENGTH_NAME)) {
+                headers.put(name, value);
+            } else if (name.equals(DefaultHeaders.CONTENT_TYPE_NAME)) {
+                headers.put(name, value);
+            } else if (name.equals(DefaultHeaders.HOST_NAME)) {
+                headers.put(name, value);
+            } else if (name.equals(DefaultHeaders.CONNECTION_NAME)) {
+                headers.put(name, value);
+            } else if (name.equals(DefaultHeaders.TRANSFER_ENCODING_NAME)) {
+                headers.put(name, value);
+            } else {
+                headers.put(name, value);
+            }
+        }
+    }
+    public String getUri() { return this.uri; }
 
     @Override
     public String getAuthType() {

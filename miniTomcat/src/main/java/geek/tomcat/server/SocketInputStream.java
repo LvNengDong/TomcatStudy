@@ -30,6 +30,7 @@ public class SocketInputStream extends InputStream {
 
     /**
      * 从输入流中解析出request line
+     *
      * @param requestLine
      * @throws IOException
      */

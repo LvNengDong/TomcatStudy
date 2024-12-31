@@ -18,23 +18,20 @@ import java.util.Deque;
 @Slf4j
 public class HttpConnector implements Runnable {
 
+    // 存放多个processor的池子【堆中】
+    final Deque<HttpProcessor> processors = new ArrayDeque<>();
     int minProcessors = 3;
     int maxProcessors = 10;
     int curProcessors = 0;
-    //存放多个processor的池子
-    final Deque<HttpProcessor> processors = new ArrayDeque<>();
 
     @Override
     public void run() {
         try {
             // 创建 ServerSocket 并监听指定端口
-            ServerSocket serverSocket = new ServerSocket(Constants.SERVER_PORT,
-                    Constants.SERVER_BACK_LOG,
-                    InetAddress.getByName(Constants.SERVER_HOST));
-
+            ServerSocket serverSocket = new ServerSocket(Constants.SERVER_PORT, Constants.SERVER_BACK_LOG, InetAddress.getByName(Constants.SERVER_HOST));
             log.info("初始化processors start");
             for (int i = 0; i < minProcessors; i++) {
-                HttpProcessor initProcessor = new HttpProcessor(this);
+                HttpProcessor initProcessor = new HttpProcessor(this);  // 一个connector可以被多个processor持有，Connector和Processor的关系是 1:N
                 initProcessor.start(); // 这表明每个process一创建就会开始执行
                 processors.push(initProcessor);
             }

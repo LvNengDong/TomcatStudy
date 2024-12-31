@@ -18,7 +18,7 @@ import java.util.Locale;
  */
 @Data
 public class Response implements ServletResponse {
-    Request request;
+    HttpRequest request;
     OutputStream output;
     String characterEncoding = null;
 

@@ -45,6 +45,9 @@ public class HttpProcessor implements Runnable {
         }
     }
 
+    /**
+     * 启动Processor
+     */
     public void start() {
         new Thread(this).start();
     }
@@ -58,8 +61,8 @@ public class HttpProcessor implements Runnable {
             OutputStream output = socket.getOutputStream();
 
             // create Request object and parse
-            Request request = new Request(input);
-            request.parse();
+            HttpRequest request = new HttpRequest(input);
+            request.parse(socket);
             log.info("从socket中解析客户端请求uri: {}", request.getUri());
 
             // create Response object
@@ -94,7 +97,7 @@ public class HttpProcessor implements Runnable {
      */
     synchronized void assign(Socket socket) {
         // 如果标志为true，表示当前Processor正在处理上一个Socket，Connector线程就继续死等，
-        // 直到Processor线程处理完上一个Socket，处理完后Processor线程会把标志位设置为false，表示有能力处理新的Socket了
+        // 直到Processor处理完上一个Socket，处理完后Processor会把标志位设置为false，表示有能力处理新的Socket了
         while (available) {
             try {
                 wait();
@@ -106,8 +109,7 @@ public class HttpProcessor implements Runnable {
         // 存储Connector分配的Socket对象，并通知processor线程处理
         this.socket = socket;
         available = true; // 改变标志位
-        notifyAll(); //唤醒等待的Connector线程，表示分配给Processor的Socket已经被接收了，这样Connector就可以全身
-        // 而退，去处理下一个Socket了，而不用一直等待分配给Processor的Socket处理完毕。
+        notifyAll(); //唤醒等待的Processor，表示分配给Processor的Socket已经被接收了，这样Connector就可以全身而退，去处理下一个Socket了，而不用一直等待分配给Processor的Socket处理完毕。
     }
 
     /**
@@ -120,7 +122,7 @@ public class HttpProcessor implements Runnable {
         // 当processor发现没有需要处理的Socket时，就会进入阻塞状态
         while (!available) {
             try {
-                log.info("当前processor没有分配到需要处理的Socket，进入阻塞状态 processor:{}", this);
+                log.info("当前没有需要处理的Socket，进入阻塞状态 processor:{}", this);
                 wait(); // 阻塞
             } catch (InterruptedException e) {
                 log.info("响应中断");

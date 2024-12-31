@@ -20,7 +20,7 @@ import java.util.Map;
 @Slf4j
 public class ServletProcessor {
 
-    public void process(Request request, Response response) {
+    public void process(HttpRequest request, Response response) {
         String servletName = null;
         try {
             // 首先根据uri最后一个/号来定位，后面的字符串认为是servlet名字(全限定类名)
