@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class StatisticResourceProcessor {
 
-    public void process(HttpRequest request, Response response) throws IOException {
+    public void process(HttpRequest request, HttpResponse response) throws IOException {
         byte[] bytes = new byte[Constants.BUFFER_SIZE];
         FileInputStream fis = null;
         OutputStream output = null;
