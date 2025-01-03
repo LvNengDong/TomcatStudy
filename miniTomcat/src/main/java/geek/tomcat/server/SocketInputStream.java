@@ -1,55 +1,43 @@
 package geek.tomcat.server;
 
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * @Author lnd
- * @Description 从输入流中读出 request line 和 header 信息来
- * @Date 2024/12/15 22:38
- */
-public class SocketInputStream extends InputStream {
+public class SocketInputStream extends ServletInputStream {
     private static final byte CR = (byte) '\r';
     private static final byte LF = (byte) '\n';
     private static final byte SP = (byte) ' ';
     private static final byte HT = (byte) '\t';
     private static final byte COLON = (byte) ':';
     private static final int LC_OFFSET = 'A' - 'a';
-
     protected byte buf[];
     protected int count;
     protected int pos;
-
     protected InputStream is;
-
 
     public SocketInputStream(InputStream is, int bufferSize) {
         this.is = is;
         buf = new byte[bufferSize];
     }
 
-    /**
-     * 从输入流中解析出request line
-     *
-     * @param requestLine
-     * @throws IOException
-     */
-    public void readRequestLine(HttpRequestLine requestLine) throws IOException {
+    //按照格式解析请求行
+    public void readRequestLine(HttpRequestLine requestLine)
+            throws IOException {
         int chr = 0;
-        //跳过空行
         do {
             try {
                 chr = read();
             } catch (IOException e) {
             }
         } while ((chr == CR) || (chr == LF));
-        //第一个非空位置
         pos--;
         int maxRead = requestLine.method.length;
         int readStart = pos;
         int readCount = 0;
         boolean space = false;
-        //解析第一段method，以空格结束
+        //这里先获取请求的method
         while (!space) {
             if (pos >= count) {
                 int val = read();
@@ -66,14 +54,13 @@ public class SocketInputStream extends InputStream {
             readCount++;
             pos++;
         }
-        requestLine.methodEnd = readCount - 1; //method段的结束位置
-
+        requestLine.uriEnd = readCount - 1;
         maxRead = requestLine.uri.length;
         readStart = pos;
         readCount = 0;
         space = false;
         boolean eol = false;
-        //解析第二段uri，以空格结束
+        //再获取请求的uri
         while (!space) {
             if (pos >= count) {
                 int val = read();
@@ -89,12 +76,11 @@ public class SocketInputStream extends InputStream {
             readCount++;
             pos++;
         }
-        requestLine.uriEnd = readCount - 1; //uri结束位置
-
+        requestLine.uriEnd = readCount - 1;
         maxRead = requestLine.protocol.length;
         readStart = pos;
         readCount = 0;
-        //解析第三段protocol，以eol结尾
+        //最后获取请求的协议
         while (!eol) {
             if (pos >= count) {
                 int val = read();
@@ -116,7 +102,9 @@ public class SocketInputStream extends InputStream {
         requestLine.protocolEnd = readCount;
     }
 
-    public void readHeader(HttpHeader header) throws IOException {
+    //读头信息，格式是header name:value
+    public void readHeader(HttpHeader header)
+            throws IOException {
         int chr = read();
         if ((chr == CR) || (chr == LF)) { // Skipping CR
             if (chr == CR)
@@ -127,11 +115,12 @@ public class SocketInputStream extends InputStream {
         } else {
             pos--;
         }
-        // 正在读取 header name
+        // 读取header名
         int maxRead = header.name.length;
         int readStart = pos;
         int readCount = 0;
         boolean colon = false;
+        //以:分隔，前面的字符认为是header name
         while (!colon) {
             // 我们处于内部缓冲区的末尾
             if (pos >= count) {
@@ -154,21 +143,23 @@ public class SocketInputStream extends InputStream {
             pos++;
         }
         header.nameEnd = readCount - 1;
-        // 读取 header 值（可以跨越多行）
+        // 读取 header 值（可以多行）
         maxRead = header.value.length;
         readStart = pos;
         readCount = 0;
         int crPos = -2;
         boolean eol = false;
         boolean validLine = true;
+        //处理行，因为一个header的值有可能多行(一行的前面是空格或者制表符)，需要连续处理
         while (validLine) {
             boolean space = true;
-            // 跳过空格
-            // 注意：仅删除前面的空格，后面的不删。
+            // Skipping spaces
+            // Note : 只有前面的空格被跳过
             while (space) {
-                // 我们已经到了内部缓冲区的尽头
+                // We're at the end of the internal buffer
                 if (pos >= count) {
-                    // 将内部缓冲区的一部分（或全部）复制到行缓冲区
+                    // Copying part (or all) of the internal buffer to the line
+                    // buffer
                     int val = read();
                     if (val == -1)
                         throw new IOException("requestStream.readline.error");
@@ -181,27 +172,30 @@ public class SocketInputStream extends InputStream {
                     space = false;
                 }
             }
+            //一直处理到行结束
             while (!eol) {
-                // 我们已经到了内部缓冲区的尽头
+                // We're at the end of the internal buffer
                 if (pos >= count) {
-                    // 将内部缓冲区的一部分（或全部）复制到行缓冲区
+                    // Copying part (or all) of the internal buffer to the line
+                    // buffer
                     int val = read();
                     if (val == -1)
                         throw new IOException("requestStream.readline.error");
                     pos = 0;
                     readStart = 0;
                 }
+                //回车换行表示行结束
                 if (buf[pos] == CR) {
                 } else if (buf[pos] == LF) {
                     eol = true;
                 } else {
-                    // FIXME：检查二进制转换是否正常
                     int ch = buf[pos] & 0xff;
                     header.value[readCount] = (char) ch;
                     readCount++;
                 }
                 pos++;
             }
+            //再往前读一个字符，如果是空格或制表符号则继续，多行处理的情况
             int nextChr = read();
             if ((nextChr != SP) && (nextChr != HT)) {
                 pos--;
@@ -217,10 +211,10 @@ public class SocketInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        if (pos >= count) { // 每次从 buf 中读到当前的字节返回，如果 pos >= count 表示当前的 byte 已获取完毕，内部就调用 fill 方法获取新的字节流。因此，对上层程序员来说，使用 read() 就相当于可以连续读取缓存中的数据。
+        if (pos >= count) {
             fill();
             if (pos >= count) {
-                return -1; // 返回 -1 表示读取出错
+                return -1;
             }
         }
         return buf[pos++] & 0xff;
@@ -239,11 +233,6 @@ public class SocketInputStream extends InputStream {
         buf = null;
     }
 
-    /**
-     * 从 InputStream 里读取一批字节，存储到 byte 数组的 buf 属性中。
-     *
-     * @throws IOException
-     */
     protected void fill() throws IOException {
         pos = 0;
         count = 0;
@@ -251,5 +240,19 @@ public class SocketInputStream extends InputStream {
         if (nRead > 0) {
             count = nRead;
         }
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
+    public boolean isReady() {
+        return false;
+    }
+
+    @Override
+    public void setReadListener(ReadListener readListener) {
     }
 }

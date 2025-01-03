@@ -65,6 +65,10 @@ public class HttpProcessor implements Runnable {
             request.parse(socket);
             log.info("从socket中解析客户端请求uri: {}", request.getUri());
 
+            if (request.getSessionId() == null || request.getSessionId().equals("")) {
+                request.getSession(true);
+            }
+
             // create Response object
             HttpResponse response = new HttpResponse(output);
             response.setRequest(request);

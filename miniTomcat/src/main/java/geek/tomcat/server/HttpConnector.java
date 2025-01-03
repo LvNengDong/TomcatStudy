@@ -4,11 +4,15 @@ import geek.tomcat.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 
+import javax.servlet.http.HttpSession;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author lnd
@@ -23,6 +27,39 @@ public class HttpConnector implements Runnable {
     int minProcessors = 3;
     int maxProcessors = 10;
     int curProcessors = 0;
+
+    //sessions map存放session
+    public static Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
+
+    //创建新的session
+    public static Session createSession() {
+        Session session = new Session();
+        session.setValid(true);
+        session.setCreationTime(System.currentTimeMillis());
+        String sessionId = generateSessionId();
+        session.setId(sessionId);
+        sessions.put(sessionId, session);
+        return (session);
+    }
+
+    //以随机方式生成byte数组,形成sessionid
+    protected static synchronized String generateSessionId() {
+        Random random = new Random();
+        long seed = System.currentTimeMillis();
+        random.setSeed(seed);
+        byte bytes[] = new byte[16];
+        random.nextBytes(bytes);
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < bytes.length; i++) {
+            byte b1 = (byte) ((bytes[i] & 0xf0) >> 4);
+            byte b2 = (byte) (bytes[i] & 0x0f);
+            if (b1 < 10) result.append((char) ('0' + b1));
+            else result.append((char) ('A' + (b1 - 10)));
+            if (b2 < 10) result.append((char) ('0' + b2));
+            else result.append((char) ('A' + (b2 - 10)));
+        }
+        return (result.toString());
+    }
 
     @Override
     public void run() {
@@ -62,6 +99,7 @@ public class HttpConnector implements Runnable {
 
     /**
      * 从池子中获取一个processor，如果池子为空且小于最大限制，则新建一个
+     *
      * @return
      */
     private HttpProcessor getProcessor() {
