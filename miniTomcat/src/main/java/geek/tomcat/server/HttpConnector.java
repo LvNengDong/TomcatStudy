@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URLClassLoader;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
@@ -30,6 +31,9 @@ public class HttpConnector implements Runnable {
 
     //sessions map存放session
     public static Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
+
+    //一个全局的class loader
+    public static URLClassLoader loader = null;
 
     //创建新的session
     public static Session createSession() {

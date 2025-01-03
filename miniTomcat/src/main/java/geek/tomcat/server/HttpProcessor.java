@@ -17,11 +17,17 @@ import java.net.Socket;
 public class HttpProcessor implements Runnable {
 
     // Connector分配给Processor的Socket对象
-    Socket socket;
+    private Socket socket;
     // 表示当前是否有需要处理的Socket，初始值为false，表示当前没有需要处理的Socket
-    boolean available = false;
+    private boolean available = false;
 
     private HttpConnector connector;
+
+    private int serverPort = 0;
+
+    private boolean keepAlive = false;
+
+    private boolean http11 = true;
 
     public HttpProcessor(HttpConnector connector) {
         this.connector = connector;
@@ -54,33 +60,44 @@ public class HttpProcessor implements Runnable {
 
     public void process(Socket socket) {
         try {
-            Thread.sleep(3000); // TODO 为什么
-
             log.info("HttpProcessor开始处理 本次处理的socket为: {}", socket);
             InputStream input = socket.getInputStream();
             OutputStream output = socket.getOutputStream();
 
-            // create Request object and parse
-            HttpRequest request = new HttpRequest(input);
-            request.parse(socket);
-            log.info("从socket中解析客户端请求uri: {}", request.getUri());
+            keepAlive = true;
 
-            if (request.getSessionId() == null || request.getSessionId().equals("")) {
-                request.getSession(true);
-            }
+            while (keepAlive) {
+                // create Request object and parse
+                HttpRequest request = new HttpRequest(input);
+                request.parse(socket);
+                log.info("从socket中解析客户端请求uri: {}", request.getUri());
 
-            // create Response object
-            HttpResponse response = new HttpResponse(output);
-            response.setRequest(request);
+                // handle session
+                if (request.getSessionId() == null || request.getSessionId().equals("")) {
+                    request.getSession(true);
+                }
 
-            if (request.getUri().startsWith("/servlet/")) {
-                log.info("从socket中解析客户端请求_servlet请求_uri:{}", request.getUri());
-                ServletProcessor processor = new ServletProcessor();
-                processor.process(request, response);
-            } else {
-                log.info("客户端请求解析_静态文件请求_uri:{}", request.getUri());
-                StatisticResourceProcessor processor = new StatisticResourceProcessor();
-                processor.process(request, response);
+                // create Response object
+                HttpResponse response = new HttpResponse(output);
+                response.setRequest(request);
+                //response.sendStaticResource();
+                request.setResponse(response);
+                response.sendHeaders();
+
+                if (request.getUri().startsWith("/servlet/")) {
+                    log.info("从socket中解析客户端请求_servlet请求_uri:{}", request.getUri());
+                    ServletProcessor processor = new ServletProcessor();
+                    processor.process(request, response);
+                } else {
+                    log.info("客户端请求解析_静态文件请求_uri:{}", request.getUri());
+                    StatisticResourceProcessor processor = new StatisticResourceProcessor();
+                    processor.process(request, response);
+                }
+                finishResponse(response);
+                System.out.println("response header connection------" + response.getHeader("Connection"));
+                if ("close".equals(response.getHeader("Connection"))) {
+                    keepAlive = false;
+                }
             }
 
             // 关闭Socket，因为现在Connector和Processor是不同线程执行的，Connector不知道分配给Processor的Socket
@@ -88,9 +105,14 @@ public class HttpProcessor implements Runnable {
             // close the socket
             log.info("请求处理完毕，关闭本次连接对应的socket(非ServerSocket) socket: {}", socket);
             socket.close();
+            socket = null;
         } catch (Exception e) {
             log.error("http processor occur exception, socket:{}", socket, e);
         }
+    }
+
+    private void finishResponse(HttpResponse response) {
+        response.finishResponse();
     }
 
     /**
