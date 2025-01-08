@@ -8,7 +8,14 @@ package geek.tomcat.server;
 public class HttpServer {
 
     public static void main(String[] args) {
+        // 创建connector和container
         HttpConnector connector = new HttpConnector();
+        ServletContainer container = new ServletContainer();
+
+        // connector和container互相指引
+        connector.setContainer(container);
+        container.setConnector(connector);
+
         connector.start();
     }
 }

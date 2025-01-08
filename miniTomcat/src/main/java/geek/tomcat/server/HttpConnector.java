@@ -35,6 +35,9 @@ public class HttpConnector implements Runnable {
     //一个全局的class loader
     public static URLClassLoader loader = null;
 
+    // 这是与connector相关联的container
+    ServletContainer container = null;
+
     //创建新的session
     public static Session createSession() {
         Session session = new Session();
@@ -134,6 +137,14 @@ public class HttpConnector implements Runnable {
 
     void recycle(HttpProcessor processor) {
         processors.push(processor);
+    }
+
+    public ServletContainer getContainer() {
+        return container;
+    }
+
+    public void setContainer(ServletContainer container) {
+        this.container = container;
     }
 }
 

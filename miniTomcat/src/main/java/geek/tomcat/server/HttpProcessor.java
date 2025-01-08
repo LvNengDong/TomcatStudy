@@ -86,7 +86,7 @@ public class HttpProcessor implements Runnable {
 
                 if (request.getUri().startsWith("/servlet/")) {
                     log.info("从socket中解析客户端请求_servlet请求_uri:{}", request.getUri());
-                    ServletProcessor processor = new ServletProcessor();
+                    ServletProcessor processor = new ServletProcessor(this.connector);
                     processor.process(request, response);
                 } else {
                     log.info("客户端请求解析_静态文件请求_uri:{}", request.getUri());
