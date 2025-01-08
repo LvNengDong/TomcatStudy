@@ -1,5 +1,7 @@
-package geek.tomcat.server;
+package geek.tomcat.core;
 
+import geek.tomcat.Container;
+import geek.tomcat.Wrapper;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.Servlet;
@@ -7,28 +9,22 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author lnd
  * @Description
  * @Date 2025/1/3 17:16
  */
-public class ServletWrapper {
+public class StandardWrapper extends ContainerBase implements Wrapper {
 
+    // wrapper内含了一个servlet实例和类
     private Servlet instance = null;
-
     private String servletClass;
 
-    private ClassLoader loader;
+    protected StandardContext parent = null;
 
-    private String name;
-
-    protected ServletContainer parent = null;
-
-    public ServletWrapper(String servletClass, ServletContainer parent) {
+    public StandardWrapper(String servletClass, StandardContext parent) {
         this.parent = parent;
         this.servletClass = servletClass;
         try {
@@ -38,11 +34,26 @@ public class ServletWrapper {
         }
     }
 
-    private ClassLoader getLoader() {
+    @Override
+    public String getInfo() {
+        return null;
+    }
+
+    public ClassLoader getLoader() {
         if (Objects.nonNull(loader)) {
             return loader;
         }
         return parent.getLoader();
+    }
+
+    @Override
+    public int getLoadOnStartup() {
+        return 0;
+    }
+
+    @Override
+    public void setLoadOnStartup(int value) {
+
     }
 
     public String getServletClass() {
@@ -53,11 +64,41 @@ public class ServletWrapper {
         this.servletClass = servletClass;
     }
 
-    public ServletContainer getParent() {
+    @Override
+    public void addInitParameter(String name, String value) {
+
+    }
+
+    @Override
+    public Servlet allocate() throws ServletException {
+        return null;
+    }
+
+    @Override
+    public String findInitParameter(String name) {
+        return null;
+    }
+
+    @Override
+    public String[] findInitParameters() {
+        return new String[0];
+    }
+
+    @Override
+    public void load() throws ServletException {
+
+    }
+
+    @Override
+    public void removeInitParameter(String name) {
+
+    }
+
+    public Container getParent() {
         return parent;
     }
 
-    public void setParent(ServletContainer container) {
+    public void setParent(StandardContext container) {
         parent = container;
     }
 

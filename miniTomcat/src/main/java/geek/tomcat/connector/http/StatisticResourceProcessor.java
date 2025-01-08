@@ -1,6 +1,8 @@
-package geek.tomcat.server;
+package geek.tomcat.connector.http;
 
 import geek.tomcat.Constants;
+import geek.tomcat.connector.http.HttpRequestImpl;
+import geek.tomcat.connector.http.HttpResponseImpl;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 import java.io.File;
@@ -19,7 +21,7 @@ import java.util.Map;
  */
 public class StatisticResourceProcessor {
 
-    public void process(HttpRequest request, HttpResponse response) throws IOException {
+    public void process(HttpRequestImpl request, HttpResponseImpl response) throws IOException {
         byte[] bytes = new byte[Constants.BUFFER_SIZE];
         FileInputStream fis = null;
         OutputStream output = null;

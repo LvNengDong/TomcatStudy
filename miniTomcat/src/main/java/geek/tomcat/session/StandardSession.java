@@ -1,32 +1,76 @@
-package geek.tomcat.server;
+package geek.tomcat.session;
+
+import geek.tomcat.Session;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author lnd
  * @Description
- * @Date 2025/1/2 17:07
+ * @Date 2025/1/8 16:45
  */
-public class Session implements HttpSession {
-    private String sessionId;
-    private long creationTime;
-    private boolean valid;
-    private Map<String, Object> attributes = new ConcurrentHashMap<>();
+public class StandardSession implements HttpSession, Session {
+    @Override
+    public void setCreationTime(long time) {
+
+    }
+
+    @Override
+    public void setId(String id) {
+
+    }
+
+    @Override
+    public String getInfo() {
+        return null;
+    }
+
+    @Override
+    public void setNew(boolean isNew) {
+
+    }
+
+    @Override
+    public HttpSession getSession() {
+        return null;
+    }
+
+    @Override
+    public void setValid(boolean isValid) {
+
+    }
+
+    @Override
+    public boolean isValid() {
+        return false;
+    }
+
+    @Override
+    public void access() {
+
+    }
+
+    @Override
+    public void expire() {
+
+    }
+
+    @Override
+    public void recycle() {
+
+    }
 
     @Override
     public long getCreationTime() {
-        return creationTime;
+        return 0;
     }
 
     @Override
     public String getId() {
-        return sessionId;
+        return null;
     }
 
     @Override
@@ -56,7 +100,7 @@ public class Session implements HttpSession {
 
     @Override
     public Object getAttribute(String name) {
-        return this.attributes.get(name);
+        return null;
     }
 
     @Override
@@ -66,7 +110,7 @@ public class Session implements HttpSession {
 
     @Override
     public Enumeration<String> getAttributeNames() {
-        return Collections.enumeration(this.attributes.keySet());
+        return null;
     }
 
     @Override
@@ -76,17 +120,17 @@ public class Session implements HttpSession {
 
     @Override
     public void setAttribute(String name, Object value) {
-        this.attributes.put(name, value);
+
     }
 
     @Override
     public void putValue(String name, Object value) {
-        this.attributes.put(name, value);
+
     }
 
     @Override
     public void removeAttribute(String name) {
-        this.attributes.remove(name);
+
     }
 
     @Override
@@ -96,23 +140,11 @@ public class Session implements HttpSession {
 
     @Override
     public void invalidate() {
-        this.valid = false;
+
     }
 
     @Override
     public boolean isNew() {
         return false;
-    }
-
-    public void setValid(boolean b) {
-        this.valid = b;
-    }
-
-    public void setCreationTime(long currentTimeMillis) {
-        this.creationTime = currentTimeMillis;
-    }
-
-    public void setId(String sessionId) {
-        this.sessionId = sessionId;
     }
 }

@@ -1,4 +1,4 @@
-package geek.tomcat.server;
+package geek.tomcat.connector;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class HttpResponseFacade implements HttpServletResponse {
     private HttpServletResponse response;
-    public HttpResponseFacade(HttpResponse response) {
+    public HttpResponseFacade(HttpServletResponse response) {
         this.response = response;
     }
 

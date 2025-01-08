@@ -1,5 +1,6 @@
-package geek.tomcat.server;
+package geek.tomcat.tmp;
 
+import geek.tomcat.core.StandardContext;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.*;
@@ -219,7 +220,7 @@ public class Request implements ServletRequest {
     }
 
     @Override
-    public ServletContext getServletContext() {
+    public StandardContext getServletContext() {
         return null;
     }
 

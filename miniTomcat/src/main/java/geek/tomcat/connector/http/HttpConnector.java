@@ -1,8 +1,9 @@
-package geek.tomcat.server;
+package geek.tomcat.connector.http;
 
 import geek.tomcat.Constants;
+import geek.tomcat.tmp.Session;
+import geek.tomcat.core.StandardContext;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 
 import javax.servlet.http.HttpSession;
 import java.net.InetAddress;
@@ -36,7 +37,7 @@ public class HttpConnector implements Runnable {
     public static URLClassLoader loader = null;
 
     // 这是与connector相关联的container
-    ServletContainer container = null;
+    StandardContext container = null;
 
     //创建新的session
     public static Session createSession() {
@@ -139,11 +140,11 @@ public class HttpConnector implements Runnable {
         processors.push(processor);
     }
 
-    public ServletContainer getContainer() {
+    public StandardContext getContainer() {
         return container;
     }
 
-    public void setContainer(ServletContainer container) {
+    public void setContainer(StandardContext container) {
         this.container = container;
     }
 }

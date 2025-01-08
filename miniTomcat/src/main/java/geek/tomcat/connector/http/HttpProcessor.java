@@ -1,4 +1,4 @@
-package geek.tomcat.server;
+package geek.tomcat.connector.http;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +68,7 @@ public class HttpProcessor implements Runnable {
 
             while (keepAlive) {
                 // create Request object and parse
-                HttpRequest request = new HttpRequest(input);
+                HttpRequestImpl request = new HttpRequestImpl(input);
                 request.parse(socket);
                 log.info("从socket中解析客户端请求uri: {}", request.getUri());
 
@@ -78,7 +78,7 @@ public class HttpProcessor implements Runnable {
                 }
 
                 // create Response object
-                HttpResponse response = new HttpResponse(output);
+                HttpResponseImpl response = new HttpResponseImpl(output);
                 response.setRequest(request);
                 //response.sendStaticResource();
                 request.setResponse(response);
@@ -111,7 +111,7 @@ public class HttpProcessor implements Runnable {
         }
     }
 
-    private void finishResponse(HttpResponse response) {
+    private void finishResponse(HttpResponseImpl response) {
         response.finishResponse();
     }
 

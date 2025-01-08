@@ -1,4 +1,6 @@
-package geek.tomcat.server;
+package geek.tomcat.connector.http;
+
+import geek.tomcat.util.CookieTools;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -16,9 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Description
  * @Date 2024/12/15 22:38
  */
-public class HttpResponse implements HttpServletResponse {
+public class HttpResponseImpl implements HttpServletResponse {
 
-    HttpRequest request;
+    HttpRequestImpl request;
     OutputStream output;
     PrintWriter writer;
 
@@ -35,10 +37,10 @@ public class HttpResponse implements HttpServletResponse {
 
     ArrayList cookies = new ArrayList<>();
 
-    public HttpResponse() {
+    public HttpResponseImpl() {
     }
 
-    public HttpResponse(OutputStream output) {
+    public HttpResponseImpl(OutputStream output) {
         this.output = output;
     }
 
@@ -46,7 +48,7 @@ public class HttpResponse implements HttpServletResponse {
         this.output = output;
     }
 
-    public void setRequest(HttpRequest request) {
+    public void setRequest(HttpRequestImpl request) {
         this.request = request;
     }
 

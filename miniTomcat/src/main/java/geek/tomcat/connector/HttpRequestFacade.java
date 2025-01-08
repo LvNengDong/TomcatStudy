@@ -1,4 +1,4 @@
-package geek.tomcat.server;
+package geek.tomcat.connector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import javax.servlet.http.Part;
 public class HttpRequestFacade implements HttpServletRequest {
     private HttpServletRequest request;
 
-    public HttpRequestFacade(HttpRequest request) {
+    public HttpRequestFacade(HttpServletRequest request) {
         this.request = request;
     }
 

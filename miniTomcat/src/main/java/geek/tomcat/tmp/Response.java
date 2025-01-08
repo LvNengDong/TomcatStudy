@@ -1,6 +1,7 @@
-package geek.tomcat.server;
+package geek.tomcat.tmp;
 
 
+import geek.tomcat.connector.http.HttpRequestImpl;
 import lombok.Data;
 
 import javax.servlet.ServletOutputStream;
@@ -18,7 +19,7 @@ import java.util.Locale;
  */
 @Data
 public class Response implements ServletResponse {
-    HttpRequest request;
+    HttpRequestImpl request;
     OutputStream output;
     String characterEncoding = null;
 

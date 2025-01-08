@@ -1,4 +1,7 @@
-package geek.tomcat.server;
+package geek.tomcat.connector.http;
+
+import geek.tomcat.core.StandardContext;
+import geek.tomcat.session.StandardSessionFacade;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -17,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Description
  * @Date 2024/12/15 22:38
  */
-public class HttpRequest implements HttpServletRequest {
+public class HttpRequestImpl implements HttpServletRequest {
 
     private InputStream input;
     private SocketInputStream sis;
@@ -42,10 +45,10 @@ public class HttpRequest implements HttpServletRequest {
     Cookie[] cookies;
     HttpSession session;
     String sessionId;
-    SessionFacade sessionFacade;
-    private HttpResponse response;
+    StandardSessionFacade standardSessionFacade;
+    private HttpResponseImpl response;
 
-    public HttpRequest() {
+    public HttpRequestImpl() {
     }
 
     public void setStream(InputStream input) {
@@ -53,11 +56,11 @@ public class HttpRequest implements HttpServletRequest {
         this.sis = new SocketInputStream(this.input, 2048);
     }
 
-    public void setResponse(HttpResponse response) {
+    public void setResponse(HttpResponseImpl response) {
         this.response = response;
     }
 
-    public HttpRequest(InputStream input) {
+    public HttpRequestImpl(InputStream input) {
         this.input = input;
         this.sis = new SocketInputStream(this.input, 2048);
     }
@@ -412,22 +415,22 @@ public class HttpRequest implements HttpServletRequest {
      * */
     @Override
     public HttpSession getSession(boolean create) {
-        if (sessionFacade != null) return sessionFacade;
+        if (standardSessionFacade != null) return standardSessionFacade;
         if (sessionId != null) {
             session = HttpConnector.sessions.get(sessionId);
             if (session != null) {
-                sessionFacade = new SessionFacade(session);
-                return sessionFacade;
+                standardSessionFacade = new StandardSessionFacade(session);
+                return standardSessionFacade;
             } else {
                 session = HttpConnector.createSession();
-                sessionFacade = new SessionFacade(session);
-                return sessionFacade;
+                standardSessionFacade = new StandardSessionFacade(session);
+                return standardSessionFacade;
             }
         } else {
             session = HttpConnector.createSession();
-            sessionFacade = new SessionFacade(session);
+            standardSessionFacade = new StandardSessionFacade(session);
             sessionId = session.getId();
-            return sessionFacade;
+            return standardSessionFacade;
         }
     }
 
@@ -437,7 +440,7 @@ public class HttpRequest implements HttpServletRequest {
 
     @Override
     public HttpSession getSession() {
-        return this.sessionFacade;
+        return this.standardSessionFacade;
     }
 
     @Override
@@ -666,7 +669,7 @@ public class HttpRequest implements HttpServletRequest {
     }
 
     @Override
-    public ServletContext getServletContext() {
+    public StandardContext getServletContext() {
         return null;
     }
 

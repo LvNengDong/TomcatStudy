@@ -1,18 +1,12 @@
-package geek.tomcat.server;
+package geek.tomcat.connector.http;
 
-import geek.tomcat.Constants;
-import geek.tomcat.util.ClassLoaderUtil;
+import geek.tomcat.connector.http.HttpConnector;
+import geek.tomcat.connector.http.HttpRequestImpl;
+import geek.tomcat.connector.http.HttpResponseImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.text.StrSubstitutor;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @Author lnd
@@ -28,7 +22,7 @@ public class ServletProcessor {
         this.connector = connector;
     }
 
-    public void process(HttpRequest request, HttpResponse response) throws IOException, ServletException {
+    public void process(HttpRequestImpl request, HttpResponseImpl response) throws IOException, ServletException {
         this.connector.getContainer().invoke(request, response);
     }
 
