@@ -22,8 +22,8 @@ public class Constants {
 
     public static void main(String[] args) {
         String currentDir = System.getProperty("user.dir");
-        System.out.println("当前工作目录：" + currentDir);
-        System.out.println(WEB_ROOT);
+        System.out.println("当前工作目录：" + currentDir); // /Volumes/DEV/code/TomcatStudy/miniTomcat
+        System.out.println(WEB_ROOT); // /Volumes/DEV/code/TomcatStudy/miniTomcat/webroot
     }
 
 

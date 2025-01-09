@@ -44,7 +44,7 @@ public class Request implements ServletRequest {
             request.append((char) buffer[j]); // 将 buffer 数组转换成 String 字符串
         }
         uri = parseUri(request.toString());
-        log.info("客户端请求解析 uri={}", uri);
+        log.info("解析客户端请求 uri={}", uri);
     }
 
     /**
