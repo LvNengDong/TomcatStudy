@@ -1,6 +1,7 @@
 package geek.tomcat.core;
 
 import geek.tomcat.Container;
+import geek.tomcat.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +22,8 @@ public abstract class ContainerBase implements Container {
 
     //父容器
     protected Container parent = null;
+
+    protected Logger logger = null;
 
     //下面是基本的get和set方法
     public abstract String getInfo();
@@ -100,4 +103,33 @@ public abstract class ContainerBase implements Container {
         }
         child.setParent(null);
     }
+
+    public synchronized void setLogger(Logger logger) {
+        Logger oldLogger = this.logger;
+        if (oldLogger == logger) return;
+        this.logger = logger;
+    }
+
+    protected void log(String message) {
+        Logger logger = getLogger();
+        if (logger != null) logger.log(logName() + ": " + message);
+        else System.out.println(logName() + ": " + message);
+    }
+
+    protected void log(String message, Throwable throwable) {
+        Logger logger = getLogger();
+        if (logger != null) logger.log(logName() + ": " + message, throwable);
+        else {
+            System.out.println(logName() + ": " + message + ": " + throwable);
+            throwable.printStackTrace(System.out);
+        }
+    }
+
+    protected String logName() {
+        String className = this.getClass().getName();
+        int period = className.lastIndexOf(".");
+        if (period >= 0) className = className.substring(period + 1);
+        return (className + "[" + getName() + "]");
+    }
+
 }

@@ -131,6 +131,8 @@ public class HttpConnector implements Runnable {
     }
 
     public void start() {
+        threadName = "HttpConnector[" + port + "]";
+        log("httpConnector.starting " + threadName);
         // this 是一个 Runnable 任务
         Thread thread = new Thread(this);
         thread.start();

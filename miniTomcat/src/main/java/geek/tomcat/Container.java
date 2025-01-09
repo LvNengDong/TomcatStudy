@@ -39,4 +39,8 @@ public interface Container {
     public void invoke(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException;
 
     public void removeChild(Container child);
+
+    public Logger getLogger();
+
+    public void setLogger(Logger logger);
 }

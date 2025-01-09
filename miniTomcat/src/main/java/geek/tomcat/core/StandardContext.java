@@ -48,6 +48,7 @@ public class StandardContext extends ContainerBase implements Context {
         } catch (IOException e) {
             System.out.println(e.toString());
         }
+        log("Container created.");
     }
 
     public String getInfo() {
