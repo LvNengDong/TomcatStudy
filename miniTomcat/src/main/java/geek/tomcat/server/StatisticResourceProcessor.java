@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -21,25 +22,28 @@ import java.util.Map;
 @Slf4j
 public class StatisticResourceProcessor {
 
+    public static final int BUFFER_SIZE = 1024;
+    
     public void process(Request request, Response response) throws IOException {
         String uri = request.getUri();
         log.info("StatisticResourceProcessor处理开始 uri={}", uri);
-        byte[] bytes = new byte[Constants.BUFFER_SIZE];
+
+        byte[] bytes = new byte[BUFFER_SIZE];
         FileInputStream fis = null;
-        OutputStream output = null;
         try {
-            output = response.getOutput();
+            OutputStream output = response.getOutput();
             File file = new File(Constants.WEB_ROOT, uri);
             if (file.exists()) {
-                // 拼响应头
-                String head = composeResponseHead(file);
-                output.write(head.getBytes("utf-8"));
+                // 写响应头
+                String responseHead = composeResponseHead(file);
+                output.write(responseHead.getBytes(StandardCharsets.UTF_8));
+
                 // 读取文件内容，写入输出流
                 fis = new FileInputStream(file);
-                int ch = fis.read(bytes, 0, Constants.BUFFER_SIZE);
-                while (ch != -1) {
+                int ch = fis.read(bytes, 0, BUFFER_SIZE);
+                while (ch != -1) { // 循环读写
                     output.write(bytes, 0, ch);
-                    ch = fis.read(bytes, 0, Constants.BUFFER_SIZE);
+                    ch = fis.read(bytes, 0, BUFFER_SIZE);
                 }
                 output.flush();
             } else {
@@ -47,7 +51,6 @@ public class StatisticResourceProcessor {
             }
         } catch (Exception e) {
             log.info("StatisticResourceProcessor处理异常 uri={}", uri, e);
-            System.out.println(e.toString());
         } finally {
             if (fis != null) {
                 fis.close();
@@ -58,7 +61,7 @@ public class StatisticResourceProcessor {
 
     private String composeResponseHead(File file) {
         long fileLength = file.length();
-        Map valuesMap = new HashMap<>();
+        Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("StatusCode", "200");
         valuesMap.put("StatusName", "OK");
         valuesMap.put("ContentType", "text/html;charset=utf-8");

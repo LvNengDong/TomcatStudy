@@ -9,8 +9,7 @@ import java.io.File;
  */
 public class Constants {
     public static final String WEB_ROOT = System.getProperty("user.dir") + File.separator + "webroot";
-    public static final int BUFFER_SIZE = 1024;
-    public static final String UTF_8 = "UTF-8";
+
     public static final String SERVER_HOST = "127.0.0.1";
     public static final int SERVER_PORT = 8080;
     public static final int SERVER_BACK_LOG = 1;
