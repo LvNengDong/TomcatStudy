@@ -30,14 +30,12 @@ public class HttpConnector implements Runnable {
             ServerSocket serverSocket = new ServerSocket(Constants.SERVER_PORT, Constants.SERVER_BACK_LOG, InetAddress.getByName(Constants.SERVER_HOST));
             log.info("服务端Server启动成功 ServerSocket={}", serverSocket);
 
-            log.info("初始化processors start");
             for (int i = 0; i < minProcessors; i++) {
                 HttpProcessor processor = new HttpProcessor();
                 processors.push(processor);
             }
             curProcessors = minProcessors;
-            log.info("初始化processors 当前处理器池中的处理器数量 curProcessorSize:{}", curProcessors);
-            log.info("初始化processors end");
+            log.info("processors init success, 当前处理器池中的处理器数量 curProcessorSize:{}", curProcessors);
 
             while (true) {
                 Socket socket = serverSocket.accept(); // 阻塞等待，直到有有客户端发起连接请求。当与客户端三次握手成功后，为每一个连接生成一个socket
