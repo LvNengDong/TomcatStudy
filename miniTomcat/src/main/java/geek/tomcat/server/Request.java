@@ -1,5 +1,6 @@
 package geek.tomcat.server;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.*;
@@ -20,6 +21,7 @@ import java.util.Map;
 public class Request implements ServletRequest {
 
     private InputStream input;
+    @Getter
     private String uri;
 
     public Request(InputStream input) {
@@ -66,10 +68,6 @@ public class Request implements ServletRequest {
             if (index2 > index1) return requestString.substring(index1 + 1, index2);
         }
         return null;
-    }
-
-    public String getUri() {
-        return uri;
     }
 
     @Override
