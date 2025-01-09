@@ -21,27 +21,25 @@ import java.util.Map;
 public class ServletProcessor {
 
     public void process(Request request, Response response) {
-        String servletName = null;
+        String uri = request.getUri();
         try {
+            log.info("ServletProcessor处理开始 uri={}", uri);
             // 首先根据uri最后一个/号来定位，后面的字符串认为是servlet名字(全限定类名)
-            String uri = request.getUri();
-            servletName = uri.substring(uri.lastIndexOf("/") + 1);
-
-            // 加载 servlet class
-            Class<?> servletClass = ClassLoaderUtil.loadClassByDir(Constants.WEB_ROOT, servletName);
+            String servletName = uri.substring(uri.lastIndexOf("/") + 1);
 
             // 写响应头
             OutputStream output = response.getOutput();
-            String head = composeResponseHead();
-            output.write(head.getBytes(StandardCharsets.UTF_8));
+            String responseHead = composeResponseHead();
+            output.write(responseHead.getBytes(StandardCharsets.UTF_8));
 
             // 反射创建 servlet 实例，并执行 service() 方法
-            Servlet servlet = null;
-            servlet = (Servlet) servletClass.newInstance();
+            Class<?> servletClass = ClassLoaderUtil.loadClassByDir(Constants.WEB_ROOT, servletName);
+            Servlet servlet = (Servlet) servletClass.newInstance();
             servlet.service(request, response);
             output.flush();
+            log.info("ServletProcessor处理结束 uri={}", uri);
         } catch (Exception e) {
-            log.error("ServletProcessor process exception servletName:{}", servletName, e);
+            log.error("ServletProcessor处理异常 uri={}", uri, e);
         }
     }
 

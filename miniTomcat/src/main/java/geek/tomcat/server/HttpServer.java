@@ -30,13 +30,11 @@ public class HttpServer {
         try {
             // 创建 ServerSocket 并监听指定端口
             ServerSocket serverSocket = new ServerSocket(Constants.SERVER_PORT, Constants.SERVER_BACK_LOG, InetAddress.getByName(Constants.SERVER_HOST));
+            log.info("服务端Server启动成功 ServerSocket={}", serverSocket);
 
             while (true) {
-                log.info("ServerSocket已启动，等待客户端连接请求");
-                // 阻塞等待，直到有有客户端发起连接请求。
-                // 当与客户端三次握手成功后，为每一个连接生成一个socket
-                Socket socket = serverSocket.accept();
-                log.info("ServerSocket与客户端建立连接成功，本次连接的socket为: {}", socket);
+                Socket socket = serverSocket.accept(); // 阻塞等待，直到有有客户端发起连接请求。当与客户端三次握手成功后，为每一个连接生成一个socket
+                log.info("服务端与客户端连接建立成功 socket={}", socket);
 
                 InputStream input = socket.getInputStream();
                 OutputStream output = socket.getOutputStream();
@@ -44,24 +42,22 @@ public class HttpServer {
                 // create Request object and parse
                 Request request = new Request(input);
                 request.parse();
-                log.info("客户端请求解析 uri:{}", request.getUri());
 
                 // create Response object
                 Response response = new Response(output);
                 response.setRequest(request);
 
                 if (request.getUri().startsWith("/servlet/")) {
-                    log.info("客户端请求解析 servlet请求 uri:{}", request.getUri());
                     ServletProcessor processor = new ServletProcessor();
                     processor.process(request, response);
                 } else {
-                    log.info("客户端请求解析 静态文件请求 uri:{}", request.getUri());
                     StatisticResourceProcessor processor = new StatisticResourceProcessor();
                     processor.process(request, response);
                 }
 
                 // close the socket
                 socket.close();
+                log.info("服务端与客户端连接关闭成功 socket={}", socket);
             }
         } catch (Exception e) {
             log.error("HttpServer exception", e);

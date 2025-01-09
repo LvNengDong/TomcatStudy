@@ -1,6 +1,7 @@
 package geek.tomcat.server;
 
 import geek.tomcat.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 import java.io.File;
@@ -17,15 +18,18 @@ import java.util.Map;
  * @Description statistic
  * @Date 2024/5/12 13:38
  */
+@Slf4j
 public class StatisticResourceProcessor {
 
     public void process(Request request, Response response) throws IOException {
+        String uri = request.getUri();
+        log.info("StatisticResourceProcessor处理开始 uri={}", uri);
         byte[] bytes = new byte[Constants.BUFFER_SIZE];
         FileInputStream fis = null;
         OutputStream output = null;
         try {
             output = response.getOutput();
-            File file = new File(Constants.WEB_ROOT, request.getUri());
+            File file = new File(Constants.WEB_ROOT, uri);
             if (file.exists()) {
                 // 拼响应头
                 String head = composeResponseHead(file);
@@ -42,10 +46,12 @@ public class StatisticResourceProcessor {
                 output.write(Constants.fileNotFoundMessage.getBytes());
             }
         } catch (Exception e) {
+            log.info("StatisticResourceProcessor处理异常 uri={}", uri, e);
             System.out.println(e.toString());
         } finally {
             if (fis != null) {
                 fis.close();
+                log.info("StatisticResourceProcessor处理结束 uri={}", uri);
             }
         }
     }
