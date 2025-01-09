@@ -51,27 +51,22 @@ public class HttpProcessor implements Runnable {
 
     public void process(Socket socket) {
         try {
-            Thread.sleep(3000); // TODO 为什么
-
-            log.info("HttpProcessor开始处理 本次处理的socket为: {}", socket);
+            log.info("socket process start, socket={}", socket);
             InputStream input = socket.getInputStream();
             OutputStream output = socket.getOutputStream();
 
             // create Request object and parse
             Request request = new Request(input);
             request.parse();
-            log.info("从socket中解析客户端请求uri: {}", request.getUri());
 
             // create Response object
             Response response = new Response(output);
             response.setRequest(request);
 
             if (request.getUri().startsWith("/servlet/")) {
-                log.info("从socket中解析客户端请求_servlet请求_uri:{}", request.getUri());
                 ServletProcessor processor = new ServletProcessor();
                 processor.process(request, response);
             } else {
-                log.info("客户端请求解析_静态文件请求_uri:{}", request.getUri());
                 StatisticResourceProcessor processor = new StatisticResourceProcessor();
                 processor.process(request, response);
             }
@@ -82,7 +77,7 @@ public class HttpProcessor implements Runnable {
             log.info("请求处理完毕，关闭本次连接对应的socket(非ServerSocket) socket: {}", socket);
             socket.close();
         } catch (Exception e) {
-            log.error("http processor occur exception, socket:{}", socket, e);
+            log.error("socket process exception, socket={}", socket, e);
         }
     }
 
