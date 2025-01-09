@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 import javax.servlet.Servlet;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -24,26 +26,18 @@ public class ServletProcessor {
         String uri = request.getUri();
         try {
             log.info("ServletProcessor处理开始 uri={}", uri);
-            // 首先根据uri最后一个/号来定位，后面的字符串认为是servlet名字(全限定类名)
-            String servletName = uri.substring(uri.lastIndexOf("/") + 1);
-
-
-            response.setCharacterEncoding(Constants.UTF_8);
-            PrintWriter writer = response.getWriter();
+            response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
 
             // 写响应头
-            OutputStream output = response.getOutput();
-            String responseHead = composeResponseHead();
-            output.write(responseHead.getBytes(StandardCharsets.UTF_8));
-            String head = composeResponseHead();
-            writer.println(head);
+            PrintWriter writer = response.getWriter();
+            writer.println(composeResponseHead());
 
+            // 首先根据uri最后一个/号来定位，后面的字符串认为是servlet名字(全限定类名)
+            String servletName = uri.substring(uri.lastIndexOf("/") + 1);
             // 反射创建 servlet 实例，并执行 service() 方法
             Class<?> servletClass = ClassLoaderUtil.loadClassByDir(Constants.WEB_ROOT, servletName);
             Servlet servlet = (Servlet) servletClass.newInstance();
-            Servlet servlet = (Servlet) servletClass.newInstance();
             servlet.service(request, response);
-            output.flush();
             log.info("ServletProcessor处理结束 uri={}", uri);
         } catch (Exception e) {
             log.error("ServletProcessor处理异常 uri={}", uri, e);
