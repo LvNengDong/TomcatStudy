@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 import javax.servlet.Servlet;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -20,29 +22,25 @@ import java.util.Map;
 @Slf4j
 public class ServletProcessor {
 
-    public void process(HttpRequest request, Response response) {
-        String servletName = null;
+    public void process(Request request, Response response) {
+        String uri = request.getUri();
         try {
-            // 首先根据uri最后一个/号来定位，后面的字符串认为是servlet名字(全限定类名)
-            String uri = request.getUri();
-            servletName = uri.substring(uri.lastIndexOf("/") + 1);
-
-            // 加载 servlet class
-            Class<?> servletClass = ClassLoaderUtil.loadClassByDir(Constants.WEB_ROOT, servletName);
-
-
-            response.setCharacterEncoding(Constants.UTF_8);
-            PrintWriter writer = response.getWriter();
+            log.info("ServletProcessor处理开始 uri={}", uri);
+            response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
 
             // 写响应头
-            String head = composeResponseHead();
-            writer.println(head);
+            PrintWriter writer = response.getWriter();
+            writer.println(composeResponseHead());
 
+            // 首先根据uri最后一个/号来定位，后面的字符串认为是servlet名字(全限定类名)
+            String servletName = uri.substring(uri.lastIndexOf("/") + 1);
             // 反射创建 servlet 实例，并执行 service() 方法
+            Class<?> servletClass = ClassLoaderUtil.loadClassByDir(Constants.WEB_ROOT, servletName);
             Servlet servlet = (Servlet) servletClass.newInstance();
             servlet.service(request, response);
+            log.info("ServletProcessor处理结束 uri={}", uri);
         } catch (Exception e) {
-            log.error("ServletProcessor process exception servletName:{}", servletName, e);
+            log.error("ServletProcessor处理异常 uri={}", uri, e);
         }
     }
 
