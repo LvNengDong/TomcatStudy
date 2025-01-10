@@ -1,6 +1,7 @@
 package geek.tomcat.server;
 
 import geek.tomcat.Constants;
+import geek.tomcat.util.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
@@ -23,12 +24,19 @@ public class HttpConnector implements Runnable {
     //存放多个processor的池子
     final Deque<HttpProcessor> processors = new ArrayDeque<>();
 
+    public void start() {
+        // this 是一个 Runnable 任务
+        Thread thread = new Thread(this, "http-connector-thread");
+        thread.start();
+    }
+
     @Override
     public void run() {
+
         try {
             // 创建 ServerSocket 并监听指定端口
             ServerSocket serverSocket = new ServerSocket(Constants.SERVER_PORT, Constants.SERVER_BACK_LOG, InetAddress.getByName(Constants.SERVER_HOST));
-            log.info("服务端Server启动成功 ServerSocket={}", serverSocket);
+            log.info("服务端Server启动成功 ServerSocket={} threadName={}", serverSocket, ThreadUtil.getCurThreadName());
 
             for (int i = 0; i < minProcessors; i++) {
                 HttpProcessor initProcessor = new HttpProcessor(this);
@@ -80,12 +88,6 @@ public class HttpConnector implements Runnable {
         processors.push(initProcessor);
         curProcessors++;
         return processors.pop();
-    }
-
-    public void start() {
-        // this 是一个 Runnable 任务
-        Thread thread = new Thread(this);
-        thread.start();
     }
 
     void recycle(HttpProcessor processor) {

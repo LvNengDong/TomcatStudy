@@ -1,5 +1,6 @@
 package geek.tomcat.server;
 
+import geek.tomcat.util.ThreadUtil;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +28,10 @@ public class HttpProcessor implements Runnable {
         this.connector = connector;
     }
 
+    public void start() {
+        new Thread(this, "http-processor-thread").start();
+    }
+
 
     /* processor线程 */
     @Override
@@ -45,13 +50,9 @@ public class HttpProcessor implements Runnable {
         }
     }
 
-    public void start() {
-        new Thread(this).start();
-    }
-
     public void process(Socket socket) {
         try {
-            log.info("socket process start, socket={}", socket);
+            log.info("socket process start, socket={} threadName={}", socket, ThreadUtil.getCurThreadName());
             InputStream input = socket.getInputStream();
             OutputStream output = socket.getOutputStream();
 
@@ -115,7 +116,7 @@ public class HttpProcessor implements Runnable {
         // 当processor发现没有需要处理的Socket时，就会进入阻塞状态
         while (!available) {
             try {
-                log.info("当前processor没有分配到需要处理的Socket，进入阻塞状态 processor:{}", this);
+                log.info("当前processor没有分配到需要处理的Socket，进入阻塞状态 processor={} threadName={}", this, ThreadUtil.getCurThreadName());
                 wait(); // 阻塞
             } catch (InterruptedException e) {
                 log.info("响应中断");
@@ -123,7 +124,7 @@ public class HttpProcessor implements Runnable {
             }
         }
         // 当processor被分配到Socket后，标志位会改为true，退出循环，继续向下执行
-        log.info("当前processor分配到了新的Socket，退出阻塞状态 processor:{} socket:{}", this, this.socket);
+        log.info("当前processor分配到了新的Socket，退出阻塞状态 processor:{} socket:{} threadName={}", this, this.socket, ThreadUtil.getCurThreadName());
         // 获得这个新的Socket
         Socket socket = this.socket;
         // 重新初始化标志位，通知Connector线程可以分配新的Socket连接给Processor了
