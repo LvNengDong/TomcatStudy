@@ -1,5 +1,7 @@
 package geek.tomcat.server;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.BufferedReader;
@@ -17,13 +19,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Description
  * @Date 2024/12/15 22:38
  */
+@Slf4j
 public class HttpRequest implements HttpServletRequest {
 
     private InputStream input;
     private SocketInputStream sis;
     private String uri;
-    InetAddress address;
-    int port;
+    InetAddress address;    // 远端地址
+    int port;   // 客户端端口号
     /**
      * 存储请求头信息
      */
@@ -46,10 +49,8 @@ public class HttpRequest implements HttpServletRequest {
             parseConnection(socket);
             this.sis.readRequestLine(requestLine);
             parseHeaders();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ServletException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("HttpRequest_Err", e);
         }
         this.uri = new String(requestLine.uri, 0, requestLine.uriEnd);
     }
@@ -57,7 +58,7 @@ public class HttpRequest implements HttpServletRequest {
 
     private void parseConnection(Socket socket) {
         address = socket.getInetAddress();
-        port = socket.getPort();    // 客户端端口号
+        port = socket.getPort();
     }
 
     private void parseHeaders() throws IOException, ServletException {

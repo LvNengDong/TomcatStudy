@@ -22,7 +22,7 @@ import java.util.Map;
 @Slf4j
 public class ServletProcessor {
 
-    public void process(Request request, Response response) {
+    public void process(HttpRequest request, Response response) {
         String uri = request.getUri();
         try {
             log.info("ServletProcessor处理开始 uri={}", uri);
