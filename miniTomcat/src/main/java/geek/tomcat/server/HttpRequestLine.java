@@ -2,11 +2,10 @@ package geek.tomcat.server;
 
 /**
  * @Author lnd
- * @Description 这个类是 Http Request 头行的抽象，格式是 method uri protocol，如 GET /hello.txt HTTP/1.1
- * @Date 2024/12/15 22:38
+ * @Description 这个类是 Http Request 头行的抽象，格式是 method uri protocol，如 GET /hello.txt HTTP/1.1。
+ * @Date 2025/1/10 11:22
  */
 public class HttpRequestLine {
-
     public static final int INITIAL_METHOD_SIZE = 8;
     public static final int INITIAL_URI_SIZE = 128;
     public static final int INITIAL_PROTOCOL_SIZE = 8;
@@ -14,7 +13,7 @@ public class HttpRequestLine {
     public static final int MAX_URI_SIZE = 2048;
     public static final int MAX_PROTOCOL_SIZE = 32;
 
-    // 下面的属性对应于Http Request规范，即头行格式method uri protocol
+    //下面的属性对应于Http Request规范，即头行格式method uri protocol
     // 如：GET /hello.txt HTTP/1.1
     // char[] 存储每段的字符串，对应的int值存储的是每段的结束位置
     public char[] method;
@@ -25,8 +24,7 @@ public class HttpRequestLine {
     public int protocolEnd;
 
     public HttpRequestLine() {
-        this(new char[INITIAL_METHOD_SIZE], 0,
-                new char[INITIAL_URI_SIZE], 0,
+        this(new char[INITIAL_METHOD_SIZE], 0, new char[INITIAL_URI_SIZE], 0,
                 new char[INITIAL_PROTOCOL_SIZE], 0);
     }
 
@@ -51,24 +49,24 @@ public class HttpRequestLine {
         return indexOf(buf, buf.length);
     }
 
-    //这是主要的方法
-    //在uri[]中查找字符串buf的出现位置
+    // 这是主要的方法
+    // 在uri[]中查找字符串buf的出现位置
     public int indexOf(char[] buf, int end) {
         char firstChar = buf[0];
-        int pos = 0; //pos是查找字符串buf在uri[]中的开始位置
+        int pos = 0;
         while (pos < uriEnd) {
-            pos = indexOf(firstChar, pos); //首字符定位开始位置
+            pos = indexOf(firstChar, pos);
             if (pos == -1) {
                 return -1;
             }
             if ((uriEnd - pos) < end) {
                 return -1;
             }
-            for (int i = 0; i < end; i++) { //从开始位置起逐个字符比对
+            for (int i = 0; i < end; i++) {
                 if (uri[i + pos] != buf[i]) {
                     break;
                 }
-                if (i == (end - 1)) { //每个字符都相等，则匹配上了，返回开始位置
+                if (i == (end - 1)) {
                     return pos;
                 }
             }
@@ -81,7 +79,6 @@ public class HttpRequestLine {
         return indexOf(str.toCharArray(), str.length());
     }
 
-    // 在uri[]中查找字符c的出现位置
     public int indexOf(char c, int start) {
         for (int i = start; i < uriEnd; i++) {
             if (uri[i] == c) {

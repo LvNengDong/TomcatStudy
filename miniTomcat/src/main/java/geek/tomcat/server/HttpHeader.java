@@ -3,10 +3,9 @@ package geek.tomcat.server;
 /**
  * @Author lnd
  * @Description
- * @Date 2024/12/23 20:53
+ * @Date 2025/1/10 14:23
  */
 public class HttpHeader {
-
     public static final int INITIAL_NAME_SIZE = 64;
     public static final int INITIAL_VALUE_SIZE = 512;
     public static final int MAX_NAME_SIZE = 128;
@@ -41,6 +40,4 @@ public class HttpHeader {
         valueEnd = 0;
         hashCode = 0;
     }
-
 }
-
