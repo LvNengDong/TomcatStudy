@@ -32,7 +32,6 @@ public class HttpConnector implements Runnable {
 
     @Override
     public void run() {
-
         try {
             // 创建 ServerSocket 并监听指定端口
             ServerSocket serverSocket = new ServerSocket(Constants.SERVER_PORT, Constants.SERVER_BACK_LOG, InetAddress.getByName(Constants.SERVER_HOST));
@@ -40,11 +39,11 @@ public class HttpConnector implements Runnable {
 
             for (int i = 0; i < minProcessors; i++) {
                 HttpProcessor initProcessor = new HttpProcessor(this);
-                initProcessor.start(); // 这表明每个process一创建就会开始执行
+                initProcessor.start(i); // 这表明每个process一创建就会开始执行
                 processors.push(initProcessor);
             }
             curProcessors = minProcessors;
-            log.info("processors init success, 当前处理器池中的处理器数量 curProcessorSize:{}", curProcessors);
+            log.info("processors init success, 当前处理器池中的处理器数量 curProcessorSize:{} threadName={}", curProcessors, ThreadUtil.getCurThreadName());
 
             while (true) {
                 Socket socket = serverSocket.accept(); // 阻塞等待，直到有有客户端发起连接请求。当与客户端三次握手成功后，为每一个连接生成一个socket
@@ -84,7 +83,7 @@ public class HttpConnector implements Runnable {
 
     private HttpProcessor newProcessor() {
         HttpProcessor initProcessor = new HttpProcessor(this);
-        initProcessor.start(); // 这表明每个process一创建就会开始执行
+        initProcessor.start(curProcessors); // 这表明每个process一创建就会开始执行
         processors.push(initProcessor);
         curProcessors++;
         return processors.pop();

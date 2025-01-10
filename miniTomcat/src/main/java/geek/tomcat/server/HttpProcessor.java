@@ -28,12 +28,11 @@ public class HttpProcessor implements Runnable {
         this.connector = connector;
     }
 
-    public void start() {
-        new Thread(this, "http-processor-thread").start();
+    public void start(int i) {
+        new Thread(this, "http-processor-thread-" + i).start();
     }
 
 
-    /* processor线程 */
     @Override
     public void run() {
         while (true) {
@@ -102,21 +101,20 @@ public class HttpProcessor implements Runnable {
         // 存储Connector分配的Socket对象，并通知processor线程处理
         this.socket = socket;
         available = true; // 改变标志位
-        notifyAll(); //唤醒等待的Connector线程，表示分配给Processor的Socket已经被接收了，这样Connector就可以全身
+        log.info("分配 Socket={} 给 processor={} 处理, threadName={}",  this.socket, this, ThreadUtil.getCurThreadName());
+        notifyAll(); // 唤醒等待的Connector线程，表示分配给Processor的Socket已经被接收了，这样Connector就可以全身
         // 而退，去处理下一个Socket了，而不用一直等待分配给Processor的Socket处理完毕。
     }
 
     /**
-     * Processor线程使用的方法
-     * 等待 Connector 提供一个新的 Socket
-     *
+     * 等待 Connector 分配一个 Socket，在未分配到 Socket 前，Processor 线程会进入阻塞状态
      * @return
      */
     synchronized Socket await() {
         // 当processor发现没有需要处理的Socket时，就会进入阻塞状态
         while (!available) {
             try {
-                log.info("当前processor没有分配到需要处理的Socket，进入阻塞状态 processor={} threadName={}", this, ThreadUtil.getCurThreadName());
+                log.info("processor={} 没有分配到需要处理的Socket，进入阻塞状态  threadName={}", this, ThreadUtil.getCurThreadName());
                 wait(); // 阻塞
             } catch (InterruptedException e) {
                 log.info("响应中断");
@@ -124,7 +122,7 @@ public class HttpProcessor implements Runnable {
             }
         }
         // 当processor被分配到Socket后，标志位会改为true，退出循环，继续向下执行
-        log.info("当前processor分配到了新的Socket，退出阻塞状态 processor:{} socket:{} threadName={}", this, this.socket, ThreadUtil.getCurThreadName());
+        log.info("processor={} 分配到了需要处理的Socket，退出阻塞状态继续执行 socket={} threadName={}", this, this.socket, ThreadUtil.getCurThreadName());
         // 获得这个新的Socket
         Socket socket = this.socket;
         // 重新初始化标志位，通知Connector线程可以分配新的Socket连接给Processor了
