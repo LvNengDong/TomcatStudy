@@ -15,8 +15,25 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author lnd
- * @Description
+ * @Description HTTP 协议中规定 Response 返回格式由以下几部分组成：状态行、响应头、空行、响应体
  * @Date 2024/12/15 22:38
+
+HTTP/1.1 200 OK
+Server: Apache/2.4.1 (Unix)
+Content-Length: 1234
+Content-Type: text/html; charset=UTF-8
+Date: Tue, 15 Nov 2010 13:12:35 GMT
+Connection: close
+
+<html>
+<head>
+<title>Test Page</title>
+</head>
+<body>
+<h1>Hello, World!</h1>
+</body>
+</html>
+
  */
 public class HttpResponse implements HttpServletResponse {
 
