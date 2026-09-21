@@ -16,7 +16,9 @@ import javax.servlet.ServletException;
 
 /**
  * @Author lnd
- * @Description Servlet容器
+ * @Description Servlet容器，负责后端 Servlet 管理
+ *  1、创建（懒加载）
+ *  2、销毁
  * @Date 2025/1/3 17:16
  */
 public class ServletContainer {
