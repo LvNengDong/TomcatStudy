@@ -12,6 +12,13 @@ public class Constants {
 
     public static final String SERVER_HOST = "127.0.0.1";
     public static final int SERVER_PORT = 8080;
+    /**
+     * TCP 连接建立要经过三次握手。操作系统内核会维护两个队列：
+     *      SYN 队列（半连接队列）：存放只收到 SYN、还没完成三次握手的请求
+     *      Accept 队列（已完成队列）：三次握手全部完成，等待应用程序调用 accept() 取走的连接
+     *
+     * backlog 参数设置的就是 Accept 队列的最大长度。
+     */
     public static final int SERVER_BACK_LOG = 1;
 
     // 下面的字符串是当文件没有找到时返回的 404 错误描述
