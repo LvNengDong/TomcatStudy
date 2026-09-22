@@ -1,5 +1,7 @@
 package geek.tomcat.server;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.Servlet;
@@ -7,15 +9,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author lnd
- * @Description
+ * @Description Servlet 的容器，用于管理 Servlet
  * @Date 2025/1/3 17:16
  */
+@Getter
+@Setter
 public class ServletWrapper {
 
     private Servlet instance = null;
@@ -25,8 +27,11 @@ public class ServletWrapper {
     private ClassLoader loader;
 
     private String name;
-
-    protected ServletContainer parent = null;
+    /**
+     * ServletWrapper 里没有 setLoader()，loader 字段永远是 null，于是 getLoader() 每次都落到 parent.getLoader()，拿到的是 ServletContainer 构造时建好的那个指向 WEB_ROOT 的 URLClassLoader。
+     *  原则：「自己有就用自己的，没有就问父容器」
+     */
+    protected ServletContainer parent = null; // 当前唯一生效的作用是向 parent 借 ClassLoader
 
     public ServletWrapper(String servletClass, ServletContainer parent) {
         this.parent = parent;
@@ -45,21 +50,6 @@ public class ServletWrapper {
         return parent.getLoader();
     }
 
-    public String getServletClass() {
-        return servletClass;
-    }
-
-    public void setServletClass(String servletClass) {
-        this.servletClass = servletClass;
-    }
-
-    public ServletContainer getParent() {
-        return parent;
-    }
-
-    public void setParent(ServletContainer container) {
-        parent = container;
-    }
 
     public Servlet getServlet() {
         return this.instance;
@@ -69,7 +59,7 @@ public class ServletWrapper {
         if (Objects.nonNull(instance)) {
             return instance;
         }
-        Servlet servlet = null;
+        Servlet servlet;
         String actualClass = servletClass;
         if (StringUtils.isEmpty(actualClass)) {
             throw new ServletException("servlet class has not been specified");

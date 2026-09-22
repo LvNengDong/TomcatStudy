@@ -1,7 +1,10 @@
 package geek.tomcat.server;
 
 import geek.tomcat.Constants;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -11,28 +14,26 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-
 /**
  * @Author lnd
  * @Description Servlet容器，负责后端 Servlet 管理
- *  1、创建（懒加载）
- *  2、销毁
+ * 1、创建（懒加载）
+ * 2、销毁
  * @Date 2025/1/3 17:16
  */
+@Getter
+@Setter
 public class ServletContainer {
 
     HttpConnector connector = null;
-    ClassLoader loader = null;  // 类加载器（构造方法中提供了默认的类加载器实现，同时也支持用户端使用 setLoader 方法设置自定义的类加载器）
 
-    // 包含servlet类和实例的map
+    ClassLoader loader = null;  // 通用（全局的）类加载器
+
     Map<String, String> servletClsMap = new ConcurrentHashMap<>(); // servletName - ServletClassName
-    Map<String,ServletWrapper> servletInstanceMap = new ConcurrentHashMap<>(); // servletName - servlet
+    Map<String, ServletWrapper> servletInstanceMap = new ConcurrentHashMap<>(); // servletName - ServletWrapper
 
     public ServletContainer() {
         try {
-            // create a URLClassLoader
             URL[] urls = new URL[1];
             URLStreamHandler streamHandler = null;
             File classPath = new File(Constants.WEB_ROOT);
@@ -42,33 +43,6 @@ public class ServletContainer {
         } catch (IOException e) {
             System.out.println(e.toString());
         }
-    }
-
-    public String getInfo() {
-        return null;
-    }
-
-    public ClassLoader getLoader() {
-        return this.loader;
-    }
-
-    public void setLoader(ClassLoader loader) {
-        this.loader = loader;
-    }
-
-    public HttpConnector getConnector() {
-        return connector;
-    }
-
-    public void setConnector(HttpConnector connector) {
-        this.connector = connector;
-    }
-
-    public String getName() {
-        return null;
-    }
-
-    public void setName(String name) {
     }
 
     /**
