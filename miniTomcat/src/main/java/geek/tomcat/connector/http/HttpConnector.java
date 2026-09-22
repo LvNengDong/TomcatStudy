@@ -1,8 +1,10 @@
 package geek.tomcat.connector.http;
 
 import geek.tomcat.Constants;
-import geek.tomcat.tmp.Session;
+import geek.tomcat.session.StandardSession;
 import geek.tomcat.core.StandardContext;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpSession;
@@ -37,11 +39,13 @@ public class HttpConnector implements Runnable {
     public static URLClassLoader loader = null;
 
     // 这是与connector相关联的container
+    @Setter
+    @Getter
     StandardContext container = null;
 
-    //创建新的session
-    public static Session createSession() {
-        Session session = new Session();
+    // 创建新的session
+    public static StandardSession createSession() {
+        StandardSession session = new StandardSession();
         session.setValid(true);
         session.setCreationTime(System.currentTimeMillis());
         String sessionId = generateSessionId();
@@ -138,14 +142,6 @@ public class HttpConnector implements Runnable {
 
     void recycle(HttpProcessor processor) {
         processors.push(processor);
-    }
-
-    public StandardContext getContainer() {
-        return container;
-    }
-
-    public void setContainer(StandardContext container) {
-        this.container = container;
     }
 }
 
