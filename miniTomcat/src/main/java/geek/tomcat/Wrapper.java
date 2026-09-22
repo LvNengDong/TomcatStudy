@@ -5,28 +5,36 @@ import javax.servlet.ServletException;
 
 /**
  * @Author lnd
- * @Description
+ * @Description 一个 Servlet
+ * 方法几乎就是 web.xml 里 <servlet> 标签的运行时化身：
  * @Date 2025/1/8 16:44
  */
- public interface Wrapper {
+public interface Wrapper extends Container {
 
-     int getLoadOnStartup();
+    String getServletClass();
 
-     void setLoadOnStartup(int value);
+    void setServletClass(String servletClass);
 
-     String getServletClass();
+    void addInitParameter(String name, String value);
 
-     void setServletClass(String servletClass);
+    String findInitParameter(String name);
 
-     void addInitParameter(String name, String value);
+    String[] findInitParameters();
 
-     Servlet allocate() throws ServletException;
+    void removeInitParameter(String name);
 
-     String findInitParameter(String name);
+    int getLoadOnStartup();
 
-     String[] findInitParameters();
+    void setLoadOnStartup(int value);
 
-     void load() throws ServletException;
 
-     void removeInitParameter(String name);
+    /**
+     * 加载类并 init
+     */
+    void load() throws ServletException;
+
+    /**
+     * 取一个可用实例
+     */
+    Servlet allocate() throws ServletException;
 }

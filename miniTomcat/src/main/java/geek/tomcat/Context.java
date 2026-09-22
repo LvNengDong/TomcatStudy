@@ -4,39 +4,42 @@ import javax.servlet.ServletContext;
 
 /**
  * @Author lnd
- * @Description
+ * @Description 一个 Web 应用
  * @Date 2025/1/8 16:44
  */
 public interface Context extends Container {
-     static final String RELOAD_EVENT = "reload";
+    String RELOAD_EVENT = "reload";
 
-     String getDisplayName();
+    String getDisplayName();
 
-     void setDisplayName(String displayName);
+    void setDisplayName(String displayName);
 
-     String getDocBase();
+    String getDocBase();
 
-     void setDocBase(String docBase);
+    void setDocBase(String docBase);
 
-     String getPath();
+    String getPath();
 
-     void setPath(String path);
+    void setPath(String path);
 
-     ServletContext getServletContext();
+    ServletContext getServletContext();
 
-     int getSessionTimeout();
+    int getSessionTimeout();
 
-     void setSessionTimeout(int timeout);
+    void setSessionTimeout(int timeout);
 
-     String getWrapperClass();
+    // ================================================== Context 负责生产自己的子容器，而且可以配置用哪个 Wrapper 实现类
+    String getWrapperClass();
 
-     void setWrapperClass(String wrapperClass);
+    void setWrapperClass(String wrapperClass);
 
-     Wrapper createWrapper();
+    Wrapper createWrapper();
 
-     String findServletMapping(String pattern);
+    // ================================================== url-pattern → servletName 的映射，对应 web.xml 的 <servlet-mapping>
+    String findServletMapping(String pattern);
 
-     String[] findServletMappings();
+    String[] findServletMappings();
 
-     void reload();
+
+    void reload();
 }
