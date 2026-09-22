@@ -1,8 +1,5 @@
 package geek.tomcat;
 
-import geek.tomcat.tmp.Request;
-import geek.tomcat.tmp.Response;
-
 /**
  * @Author lnd
  * @Description
