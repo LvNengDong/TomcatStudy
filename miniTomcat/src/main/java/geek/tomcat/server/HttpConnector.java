@@ -1,6 +1,8 @@
 package geek.tomcat.server;
 
 import geek.tomcat.Constants;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpSession;
@@ -20,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date 2024/5/12 22:22
  */
 @Slf4j
+@Setter
+@Getter
 public class HttpConnector implements Runnable {
 
     // 存放多个processor的池子【堆中】
@@ -31,10 +35,7 @@ public class HttpConnector implements Runnable {
     //sessions map存放session
     public static Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
 
-    //一个全局的class loader
-    public static URLClassLoader loader = null;
-
-    // 这是与connector相关联的container
+    // 建立 Connector ↔ Container 的相互引用，Connector 把【request】转给 Container 处理，Container 把处理结果【response】转给 Connector
     ServletContainer container = null;
 
     //创建新的session
@@ -136,14 +137,6 @@ public class HttpConnector implements Runnable {
 
     void recycle(HttpProcessor processor) {
         processors.push(processor);
-    }
-
-    public ServletContainer getContainer() {
-        return container;
-    }
-
-    public void setContainer(ServletContainer container) {
-        this.container = container;
     }
 }
 
