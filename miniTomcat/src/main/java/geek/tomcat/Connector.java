@@ -10,19 +10,19 @@ import geek.tomcat.tmp.Response;
  */
 public interface Connector {
 
-    public Container getContainer();
+     Container getContainer();
 
-    public void setContainer(Container container);
+     void setContainer(Container container);
 
-    public String getInfo();
+     String getInfo();
 
-    public String getScheme();
+     String getScheme();
 
-    public void setScheme(String scheme);
+     void setScheme(String scheme);
 
-    public Request createRequest();
+     Request createRequest();
 
-    public Response createResponse();
+     Response createResponse();
 
-    public void initialize();
+     void initialize();
 }

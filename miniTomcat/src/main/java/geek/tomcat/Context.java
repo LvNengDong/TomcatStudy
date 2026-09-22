@@ -8,35 +8,35 @@ import javax.servlet.ServletContext;
  * @Date 2025/1/8 16:44
  */
 public interface Context extends Container {
-    public static final String RELOAD_EVENT = "reload";
+     static final String RELOAD_EVENT = "reload";
 
-    public String getDisplayName();
+     String getDisplayName();
 
-    public void setDisplayName(String displayName);
+     void setDisplayName(String displayName);
 
-    public String getDocBase();
+     String getDocBase();
 
-    public void setDocBase(String docBase);
+     void setDocBase(String docBase);
 
-    public String getPath();
+     String getPath();
 
-    public void setPath(String path);
+     void setPath(String path);
 
-    public ServletContext getServletContext();
+     ServletContext getServletContext();
 
-    public int getSessionTimeout();
+     int getSessionTimeout();
 
-    public void setSessionTimeout(int timeout);
+     void setSessionTimeout(int timeout);
 
-    public String getWrapperClass();
+     String getWrapperClass();
 
-    public void setWrapperClass(String wrapperClass);
+     void setWrapperClass(String wrapperClass);
 
-    public Wrapper createWrapper();
+     Wrapper createWrapper();
 
-    public String findServletMapping(String pattern);
+     String findServletMapping(String pattern);
 
-    public String[] findServletMappings();
+     String[] findServletMappings();
 
-    public void reload();
+     void reload();
 }

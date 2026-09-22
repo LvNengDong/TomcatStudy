@@ -11,28 +11,28 @@ import java.net.Socket;
  * @Description
  * @Date 2025/1/8 17:30
  */
-public interface Request {
-    public Connector getConnector();
-    public void setConnector(Connector connector);
-    public Context getContext();
-    public void setContext(Context context);
-    public String getInfo();
-    public ServletRequest getRequest();
-    public Response getResponse();
-    public void setResponse(Response response);
-    public Socket getSocket();
-    public void setSocket(Socket socket);
-    public InputStream getStream();
-    public void setStream(InputStream stream);
-    public Wrapper getWrapper();
-    public void setWrapper(Wrapper wrapper);
-    public ServletInputStream createInputStream() throws IOException;
-    public void finishRequest() throws IOException;
-    public void recycle();
-    public void setContentLength(int length);
-    public void setContentType(String type);
-    public void setProtocol(String protocol);
-    public void setRemoteAddr(String remote);
-    public void setScheme(String scheme);
-    public void setServerPort(int port);
+ public interface Request {
+     Connector getConnector();
+     void setConnector(Connector connector);
+     Context getContext();
+     void setContext(Context context);
+     String getInfo();
+     ServletRequest getRequest();
+     Response getResponse();
+     void setResponse(Response response);
+     Socket getSocket();
+     void setSocket(Socket socket);
+     InputStream getStream();
+     void setStream(InputStream stream);
+     Wrapper getWrapper();
+     void setWrapper(Wrapper wrapper);
+     ServletInputStream createInputStream() throws IOException;
+     void finishRequest() throws IOException;
+     void recycle();
+     void setContentLength(int length);
+     void setContentType(String type);
+     void setProtocol(String protocol);
+     void setRemoteAddr(String remote);
+     void setScheme(String scheme);
+     void setServerPort(int port);
 }

@@ -7,22 +7,22 @@ import javax.servlet.http.HttpSession;
  * @Description
  * @Date 2025/1/8 17:32
  */
-public interface Session {
-    public static final String SESSION_CREATED_EVENT = "createSession";
-    public static final String SESSION_DESTROYED_EVENT = "destroySession";
-    public long getCreationTime();
-    public void setCreationTime(long time);
-    public String getId();
-    public void setId(String id);
-    public String getInfo();
-    public long getLastAccessedTime();
-    public int getMaxInactiveInterval();
-    public void setMaxInactiveInterval(int interval);
-    public void setNew(boolean isNew);
-    public HttpSession getSession();
-    public void setValid(boolean isValid);
-    public boolean isValid();
-    public void access();
-    public void expire();
-    public void recycle();
+ public interface Session {
+     static final String SESSION_CREATED_EVENT = "createSession";
+     static final String SESSION_DESTROYED_EVENT = "destroySession";
+     long getCreationTime();
+     void setCreationTime(long time);
+     String getId();
+     void setId(String id);
+     String getInfo();
+     long getLastAccessedTime();
+     int getMaxInactiveInterval();
+     void setMaxInactiveInterval(int interval);
+     void setNew(boolean isNew);
+     HttpSession getSession();
+     void setValid(boolean isValid);
+     boolean isValid();
+     void access();
+     void expire();
+     void recycle();
 }
