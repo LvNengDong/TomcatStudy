@@ -9,20 +9,20 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @Author lnd
  * @Description 因为存在多层 Container，很多特性是共有的，所以我们定义 ContainerBase 作为基础类
+ * ContainerBase 把子容器管理和类加载器向上委托这些共性下沉，避免每个容器层重复实现
  * @Date 2025/1/8 15:32
  */
 public abstract class ContainerBase implements Container {
-    //子容器
+    // 父子容器
     protected Map<String, Container> children = new ConcurrentHashMap<>();
+    protected Container parent = null;
 
     //类加载器
     protected ClassLoader loader = null;
 
     protected String name = null;
 
-    //父容器
-    protected Container parent = null;
-
+    // 下面是基本的get和set方法
     protected Logger logger = null;
 
     //下面是基本的get和set方法
@@ -30,12 +30,12 @@ public abstract class ContainerBase implements Container {
 
     public ClassLoader getLoader() {
         if (loader != null) {
-            return (loader);
+            return loader;
         }
         if (parent != null) {
-            return (parent.getLoader());
+            return parent.getLoader();
         }
-        return (null);
+        return null;
     }
 
     public synchronized void setLoader(ClassLoader loader) {
@@ -63,7 +63,6 @@ public abstract class ContainerBase implements Container {
         this.parent = container;
     }
 
-    //下面是对children map的增删改查操作
     public void addChild(Container child) {
         addChildInternal(child);
     }

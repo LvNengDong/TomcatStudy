@@ -1,6 +1,5 @@
 package geek.tomcat.connector.http;
 
-import geek.tomcat.core.StandardContext;
 import geek.tomcat.session.StandardSessionFacade;
 
 import javax.servlet.*;
@@ -669,7 +668,7 @@ public class HttpRequestImpl implements HttpServletRequest {
     }
 
     @Override
-    public StandardContext getServletContext() {
+    public ServletContext getServletContext() {
         return null;
     }
 

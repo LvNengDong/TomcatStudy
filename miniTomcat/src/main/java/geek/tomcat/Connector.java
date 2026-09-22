@@ -1,8 +1,5 @@
 package geek.tomcat;
 
-import geek.tomcat.tmp.Request;
-import geek.tomcat.tmp.Response;
-
 /**
  * @Author lnd
  * @Description
@@ -10,19 +7,22 @@ import geek.tomcat.tmp.Response;
  */
 public interface Connector {
 
-    public Container getContainer();
+     Container getContainer();
 
-    public void setContainer(Container container);
+     void setContainer(Container container);
 
-    public String getInfo();
+     String getInfo();
 
-    public String getScheme();
 
-    public void setScheme(String scheme);
+     // getScheme / setScheme —— http 还是 https，一个 Connector 对应一种协议 + 一个端口
+     String getScheme();
+     void setScheme(String scheme);
 
-    public Request createRequest();
 
-    public Response createResponse();
+     // createRequest() / createResponse() —— 最能说明 Connector 定位的两个方法：Request/Response 的具体实现由协议决定（HTTP 的和 AJP 的不一样），所以由 Connector 来生产。
+     Request createRequest();
+     Response createResponse();
 
-    public void initialize();
+     // 启动前的初始化钩子
+     void initialize();
 }

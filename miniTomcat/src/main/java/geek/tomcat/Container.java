@@ -7,40 +7,46 @@ import java.io.IOException;
 
 /**
  * @Author lnd
- * @Description
+ * @Description 所有容器层的共同契约
  * @Date 2025/1/8 15:32
  */
 public interface Container {
 
-    public static final String ADD_CHILD_EVENT = "addChild";
+    String ADD_CHILD_EVENT = "addChild";
 
-    public static final String REMOVE_CHILD_EVENT = "removeChild";
+    String REMOVE_CHILD_EVENT = "removeChild";
 
-    public String getInfo();
+    // ==================================================
+    String getInfo();
 
-    public ClassLoader getLoader();
+    ClassLoader getLoader();
 
-    public void setLoader(ClassLoader loader);
+    /* 每个容器层可以有自己的类加载器 */
+    void setLoader(ClassLoader loader);
 
-    public String getName();
+    String getName();
 
-    public void setName(String name);
+    void setName(String name);
 
-    public Container getParent();
+    // ================================================== 树结构（父子双边）
+    Container getParent();
 
-    public void setParent(Container container);
+    void setParent(Container container);
 
-    public void addChild(Container child);
+    void addChild(Container child);
 
-    public Container findChild(String name);
+    Container findChild(String name);
 
-    public Container[] findChildren();
+    Container[] findChildren();
 
-    public void invoke(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException;
+    void removeChild(Container child);
 
-    public void removeChild(Container child);
+    Logger getLogger();
 
-    public Logger getLogger();
+    void setLogger(Logger logger);
 
-    public void setLogger(Logger logger);
+    // ================================================== 行为（整个接口唯一的动词）
+    /* 关键词 invoke 只有一个。上层调用下层时不需要知道下层是 Context 还是 Wrapper，一律 invoke
+    —— 这是分层能成立的前提，也是后面 Valve 责任链能一路穿下去的基础。 */
+    void invoke(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException;
 }

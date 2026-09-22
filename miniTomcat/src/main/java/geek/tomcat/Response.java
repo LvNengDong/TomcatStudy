@@ -11,27 +11,27 @@ import java.io.PrintWriter;
  * @Description
  * @Date 2025/1/8 17:31
  */
-public interface Response {
-    public Connector getConnector();
-    public void setConnector(Connector connector);
-    public int getContentCount();
-    public Context getContext();
-    public void setContext(Context context);
-    public String getInfo();
-    public Request getRequest();
-    public void setRequest(Request request);
-    public ServletResponse getResponse();
-    public OutputStream getStream();
-    public void setStream(OutputStream stream);
-    public void setError();
-    public boolean isError();
-    public ServletOutputStream createOutputStream() throws IOException;
-    public void finishResponse() throws IOException;
-    public int getContentLength();
-    public String getContentType();
-    public PrintWriter getReporter();
-    public void recycle();
-    public void resetBuffer();
-    public void sendAcknowledgement() throws IOException;
+ public interface Response {
+     Connector getConnector();
+     void setConnector(Connector connector);
+     int getContentCount();
+     Context getContext();
+     void setContext(Context context);
+     String getInfo();
+     Request getRequest();
+     void setRequest(Request request);
+     ServletResponse getResponse();
+     OutputStream getStream();
+     void setStream(OutputStream stream);
+     void setError();
+     boolean isError();
+     ServletOutputStream createOutputStream() throws IOException;
+     void finishResponse() throws IOException;
+     int getContentLength();
+     String getContentType();
+     PrintWriter getReporter();
+     void recycle();
+     void resetBuffer();
+     void sendAcknowledgement() throws IOException;
 }
 
