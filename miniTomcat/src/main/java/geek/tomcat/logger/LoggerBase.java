@@ -13,7 +13,7 @@ import java.io.PrintWriter;
  */
 public abstract class LoggerBase implements Logger {
     protected int debug = 0;
-    protected static final String info = "com.minit.logger.LoggerBase/1.0";
+    protected static final String info = "geek.tomcat.logger.LoggerBase/1.0";
     protected int verbosity = ERROR;
 
     public int getDebug() {

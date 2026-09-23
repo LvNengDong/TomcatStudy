@@ -6,17 +6,25 @@ package geek.tomcat;
  * @Date 2025/1/9 14:47
  */
 public interface Logger {
-    public static final int FATAL = Integer.MIN_VALUE;
-    public static final int ERROR = 1;
-    public static final int WARNING = 2;
-    public static final int INFORMATION = 3;
-    public static final int DEBUG = 4;
-    public String getInfo();
-    public int getVerbosity();
-    public void setVerbosity(int verbosity);
-    public void log(String message);
-    public void log(Exception exception, String msg);
-    public void log(String message, Throwable throwable);
-    public void log(String message, int verbosity);
-    public void log(String message, Throwable throwable, int verbosity);
+    int FATAL = Integer.MIN_VALUE;
+    int ERROR = 1;
+    int WARNING = 2;
+    int INFORMATION = 3;
+    int DEBUG = 4;
+
+    String getInfo();
+
+    int getVerbosity();
+
+    void setVerbosity(int verbosity);
+
+    void log(String message);
+
+    void log(Exception exception, String msg);
+
+    void log(String message, Throwable throwable);
+
+    void log(String message, int verbosity);
+
+    void log(String message, Throwable throwable, int verbosity);
 }

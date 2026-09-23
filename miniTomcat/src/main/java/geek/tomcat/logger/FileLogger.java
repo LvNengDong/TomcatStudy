@@ -1,12 +1,12 @@
 package geek.tomcat.logger;
 
-import com.sun.jmx.snmp.Timestamp;
 import geek.tomcat.util.StringManager;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Timestamp;
 
 /**
  * @Author lnd
@@ -17,7 +17,7 @@ import java.io.PrintWriter;
 public class FileLogger extends LoggerBase {
     private String date = "";
     private String directory = "logs";
-    protected static final String info = "com.minit.logger.FileLogger/0.1";
+    protected static final String info = "geek.tomcat.logger.FileLogger/0.1";
     private String prefix = "minit.";
     private StringManager sm = StringManager.getManager(Constants.Package);
     private boolean started = false;
