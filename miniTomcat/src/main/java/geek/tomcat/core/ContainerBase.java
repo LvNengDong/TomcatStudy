@@ -103,22 +103,38 @@ public abstract class ContainerBase implements Container {
         child.setParent(null);
     }
 
+    public Logger getLogger() {
+        if (logger != null) {
+            return logger;
+        }
+        if (parent != null) {
+            return parent.getLogger();
+        }
+        return (null);
+    }
+
     public synchronized void setLogger(Logger logger) {
         Logger oldLogger = this.logger;
-        if (oldLogger == logger) return;
+        if (oldLogger == logger) {
+            return;
+        }
         this.logger = logger;
     }
 
     protected void log(String message) {
         Logger logger = getLogger();
-        if (logger != null) logger.log(logName() + ": " + message);
-        else System.out.println(logName() + ": " + message);
+        if (logger != null) {
+            logger.log(logName() + ": " + message);
+        } else {
+            System.out.println(logName() + ": " + message);
+        }
     }
 
     protected void log(String message, Throwable throwable) {
         Logger logger = getLogger();
-        if (logger != null) logger.log(logName() + ": " + message, throwable);
-        else {
+        if (logger != null) {
+            logger.log(logName() + ": " + message, throwable);
+        } else {
             System.out.println(logName() + ": " + message + ": " + throwable);
             throwable.printStackTrace(System.out);
         }

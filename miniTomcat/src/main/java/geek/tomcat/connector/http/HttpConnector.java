@@ -18,11 +18,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * @Author lnd
- * @Description HttpConnector 实现了 Runnable 接口，把它看作一个线程，支持并发处理，提高整个服务器的吞吐量
- * @Date 2024/5/12 22:22
- */
+import static java.rmi.server.LogStream.log;
+
 @Slf4j
 public class HttpConnector implements Runnable {
 
@@ -42,6 +39,9 @@ public class HttpConnector implements Runnable {
     @Setter
     @Getter
     StandardContext container = null;
+
+    private String threadName = null;
+    private int port = 8080;
 
     // 创建新的session
     public static StandardSession createSession() {

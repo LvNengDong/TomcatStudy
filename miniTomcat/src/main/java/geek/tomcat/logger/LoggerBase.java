@@ -1,6 +1,8 @@
 package geek.tomcat.logger;
 
 import geek.tomcat.Logger;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.servlet.ServletException;
 import java.io.CharArrayWriter;
@@ -12,29 +14,14 @@ import java.io.PrintWriter;
  * @Date 2025/1/9 14:47
  */
 public abstract class LoggerBase implements Logger {
+    @Getter
+    @Setter
     protected int debug = 0;
-    protected static final String info = "geek.tomcat.logger.LoggerBase/1.0";
+    @Getter
+    protected String info = "geek.tomcat.logger.LoggerBase/1.0";
+    @Getter
+    @Setter
     protected int verbosity = ERROR;
-
-    public int getDebug() {
-        return (this.debug);
-    }
-
-    public void setDebug(int debug) {
-        this.debug = debug;
-    }
-
-    public String getInfo() {
-        return (info);
-    }
-
-    public int getVerbosity() {
-        return (this.verbosity);
-    }
-
-    public void setVerbosity(int verbosity) {
-        this.verbosity = verbosity;
-    }
 
     public void setVerbosityLevel(String verbosity) {
         if ("FATAL".equalsIgnoreCase(verbosity))
