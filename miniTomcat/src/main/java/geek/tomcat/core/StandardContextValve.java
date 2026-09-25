@@ -21,6 +21,8 @@ public class StandardContextValve extends ValveBase {
         return "geek.tomcat.core.StandardContextValve";
     }
 
+    private FilterDef filterDef = null;
+
     @Override
     public void invoke(Request request, Response response, ValveContext valveContext) throws IOException, ServletException {
         StandardWrapper standardWrapper = null;
@@ -28,7 +30,7 @@ public class StandardContextValve extends ValveBase {
         String servletName = uri.substring(uri.lastIndexOf("/") + 1);
         String servletClassName = servletName;
         //从容器中获取servlet wrapper
-        StandardContext context = (StandardContext)getContainer();
+        StandardContext context = (StandardContext) getContainer();
         Wrapper servletWrapper = context.getWrapper(servletName);
         try {
             servletWrapper.invoke(request, response);

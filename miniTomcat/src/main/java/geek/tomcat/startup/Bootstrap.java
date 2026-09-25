@@ -2,6 +2,8 @@ package geek.tomcat.startup;
 
 import geek.tomcat.Logger;
 import geek.tomcat.connector.http.HttpConnector;
+import geek.tomcat.core.FilterDef;
+import geek.tomcat.core.FilterMap;
 import geek.tomcat.core.StandardContext;
 import geek.tomcat.logger.FileLogger;
 
@@ -31,6 +33,15 @@ public class Bootstrap {
         Logger logger = new FileLogger();
         container.setLogger(logger); // 我们把 Logger 传给 Container 的原因在于，多个 Container 可以使用不同的 Logger，针对不同的目录和文件进行操作。
 
+        FilterDef filterDef = new FilterDef();
+        filterDef.setFilterName("TestFilter");
+        filterDef.setFilterClass("test.TestFilter");
+        container.addFilterDef(filterDef);
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName("TestFilter");
+        filterMap.setURLPattern("/*");
+        container.addFilterMap(filterMap);
+        container.filterStart();
         connector.start();
     }
 
