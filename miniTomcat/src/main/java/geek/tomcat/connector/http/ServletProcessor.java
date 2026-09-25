@@ -1,5 +1,7 @@
 package geek.tomcat.connector.http;
 
+import geek.tomcat.Request;
+import geek.tomcat.Response;
 import geek.tomcat.connector.http.HttpConnector;
 import geek.tomcat.connector.http.HttpRequestImpl;
 import geek.tomcat.connector.http.HttpResponseImpl;
@@ -22,7 +24,7 @@ public class ServletProcessor {
         this.connector = connector;
     }
 
-    public void process(HttpRequestImpl request, HttpResponseImpl response) throws IOException, ServletException {
+    public void process(Request request, Response response) throws IOException, ServletException {
         this.connector.getContainer().invoke(request, response);
     }
 

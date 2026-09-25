@@ -31,7 +31,10 @@ import java.io.PrintWriter;
      String getContentType();
      PrintWriter getReporter();
      void recycle();
-     void resetBuffer();
+
+    void setContentLengthLong(int length);
+
+    void resetBuffer();
      void sendAcknowledgement() throws IOException;
 }
 

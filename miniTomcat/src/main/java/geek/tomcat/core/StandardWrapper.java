@@ -1,6 +1,8 @@
 package geek.tomcat.core;
 
 import geek.tomcat.Container;
+import geek.tomcat.Request;
+import geek.tomcat.Response;
 import geek.tomcat.Wrapper;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,6 +27,8 @@ public class StandardWrapper extends ContainerBase implements Wrapper {
     protected StandardContext parent = null;
 
     public StandardWrapper(String servletClass, StandardContext parent) {
+        super();
+        pipeline.setBasic(new StandardWrapperValve());
         this.parent = parent;
         this.servletClass = servletClass;
         try {
@@ -127,10 +131,9 @@ public class StandardWrapper extends ContainerBase implements Wrapper {
         return null;
     }
 
-    public void invoke(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        if (instance != null) {
-            instance.service(request, response);
-        }
+    public void invoke(Request request, Response response) throws IOException, ServletException {
+        System.out.println("StandardWrapper invoke()");
+        super.invoke(request, response);
     }
 
 }

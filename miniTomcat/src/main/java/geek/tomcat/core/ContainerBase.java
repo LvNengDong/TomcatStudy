@@ -1,8 +1,13 @@
 package geek.tomcat.core;
 
-import geek.tomcat.Container;
-import geek.tomcat.Logger;
+import geek.tomcat.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,6 +29,16 @@ public abstract class ContainerBase implements Container {
 
     // 下面是基本的get和set方法
     protected Logger logger = null;
+
+    @Setter
+    @Getter
+    protected Pipeline pipeline = new StandardPipeline(this); //增加pipeline支持
+
+    @Override
+    public void invoke(Request request, Response response) throws IOException, ServletException {
+        System.out.println("ContainerBase invoke()");
+        pipeline.invoke(request, response);
+    }
 
     //下面是基本的get和set方法
     public abstract String getInfo();

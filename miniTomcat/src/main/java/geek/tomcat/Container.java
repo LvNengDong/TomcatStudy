@@ -48,5 +48,5 @@ public interface Container {
     // ================================================== 行为（整个接口唯一的动词）
     /* 关键词 invoke 只有一个。上层调用下层时不需要知道下层是 Context 还是 Wrapper，一律 invoke
     —— 这是分层能成立的前提，也是后面 Valve 责任链能一路穿下去的基础。 */
-    void invoke(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException;
+    void invoke(Request request, Response response) throws IOException, ServletException;
 }

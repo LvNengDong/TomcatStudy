@@ -111,8 +111,7 @@ public final class AccessLogValve extends ValveBase {
     }
 
     @Override
-    public void invoke(Request request, Response response, ValveContext context)
-            throws IOException, ServletException {
+    public void invoke(Request request, Response response, ValveContext context) throws IOException, ServletException {
         context.invokeNext(request, response); // ① 先把请求交下去
         // ② 再记日志
         LocalDate date = getDate();

@@ -1,8 +1,13 @@
 package geek.tomcat.connector.http;
 
+import geek.tomcat.Connector;
+import geek.tomcat.Context;
+import geek.tomcat.Request;
+import geek.tomcat.Response;
 import geek.tomcat.util.CookieTools;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -18,14 +23,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Description
  * @Date 2024/12/15 22:38
  */
-public class HttpResponseImpl implements HttpServletResponse {
+public class HttpResponseImpl implements HttpServletResponse, Response {
 
     HttpRequestImpl request;
     OutputStream output;
     PrintWriter writer;
 
     String contentType = null;
-    long contentLength = -1;
+    int contentLength = -1;
     String charset = null;
     String characterEncoding = "UTF-8";
     String protocol = "HTTP/1.1";
@@ -44,8 +49,73 @@ public class HttpResponseImpl implements HttpServletResponse {
         this.output = output;
     }
 
+    @Override
+    public Connector getConnector() {
+        return null;
+    }
+
+    @Override
+    public void setConnector(Connector connector) {
+
+    }
+
+    @Override
+    public int getContentCount() {
+        return 0;
+    }
+
+    @Override
+    public Context getContext() {
+        return null;
+    }
+
+    @Override
+    public void setContext(Context context) {
+
+    }
+
+    @Override
+    public String getInfo() {
+        return "";
+    }
+
+    @Override
+    public Request getRequest() {
+        return null;
+    }
+
+    @Override
+    public void setRequest(Request request) {
+
+    }
+
+    @Override
+    public ServletResponse getResponse() {
+        return null;
+    }
+
+    @Override
+    public OutputStream getStream() {
+        return null;
+    }
+
     public void setStream(OutputStream output) {
         this.output = output;
+    }
+
+    @Override
+    public void setError() {
+
+    }
+
+    @Override
+    public boolean isError() {
+        return false;
+    }
+
+    @Override
+    public ServletOutputStream createOutputStream() throws IOException {
+        return null;
     }
 
     public void setRequest(HttpRequestImpl request) {
@@ -155,7 +225,7 @@ public class HttpResponseImpl implements HttpServletResponse {
         outputWriter.flush();
     }
 
-    private long getContentLength() {
+    public int getContentLength() {
         return this.contentLength;
     }
 
@@ -298,6 +368,16 @@ public class HttpResponseImpl implements HttpServletResponse {
     }
 
     @Override
+    public PrintWriter getReporter() {
+        return null;
+    }
+
+    @Override
+    public void recycle() {
+
+    }
+
+    @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return null;
     }
@@ -319,7 +399,12 @@ public class HttpResponseImpl implements HttpServletResponse {
     }
 
     @Override
-    public void setContentLengthLong(long length) {
+    public void setContentLengthLong(long len) {
+
+    }
+
+    @Override
+    public void setContentLengthLong(int length) {
         this.contentLength = length;
     }
 
@@ -345,6 +430,11 @@ public class HttpResponseImpl implements HttpServletResponse {
 
     @Override
     public void resetBuffer() {
+
+    }
+
+    @Override
+    public void sendAcknowledgement() throws IOException {
 
     }
 

@@ -1,5 +1,6 @@
 package geek.tomcat.connector.http;
 
+import geek.tomcat.Request;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

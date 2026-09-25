@@ -1,8 +1,6 @@
 package geek.tomcat.core;
 
-import geek.tomcat.Constants;
-import geek.tomcat.Context;
-import geek.tomcat.Wrapper;
+import geek.tomcat.*;
 import geek.tomcat.connector.HttpRequestFacade;
 import geek.tomcat.connector.HttpResponseFacade;
 import geek.tomcat.connector.http.HttpConnector;
@@ -37,6 +35,8 @@ public class StandardContext extends ContainerBase implements Context {
     Map<String, StandardWrapper> servletInstanceMap = new ConcurrentHashMap<>(); // servletName - servlet
 
     public StandardContext() {
+        super();
+        pipeline.setBasic(new StandardContextValve());
         try {
             // create a URLClassLoader
             URL[] urls = new URL[1];
@@ -81,27 +81,9 @@ public class StandardContext extends ContainerBase implements Context {
     /**
      * 从map中找到相关的servlet，然后调用
      */
-    public void invoke(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        StandardWrapper standardWrapper = null;
-        String uri = ((HttpRequestImpl) request).getUri();
-        String servletName = uri.substring(uri.lastIndexOf("/") + 1);
-        String servletClassName = servletName;
-        //从容器中获取servlet wrapper
-        standardWrapper = servletInstanceMap.get(servletName);
-        try {
-            if (Objects.isNull(standardWrapper)) {
-                // 如果容器中没有这个servlet，先要load类，创建新实例
-                standardWrapper = new StandardWrapper(servletClassName, this);
-                servletClsMap.put(servletName, servletClassName);
-                servletInstanceMap.put(servletName, standardWrapper);
-            }
-            // 然后调用 service()
-            HttpRequestFacade requestFacade = new HttpRequestFacade(request);
-            HttpResponseFacade responseFacade = new HttpResponseFacade(response);
-            standardWrapper.invoke(requestFacade, responseFacade);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public void invoke(Request request, Response response) throws IOException, ServletException {
+        super.invoke(request, response);
     }
 
     @Override
@@ -157,6 +139,17 @@ public class StandardContext extends ContainerBase implements Context {
     @Override
     public void setWrapperClass(String wrapperClass) {
 
+    }
+
+    public Wrapper getWrapper(String name){
+        StandardWrapper servletWrapper = servletInstanceMap.get(name);
+        if ( servletWrapper == null) {
+            String servletClassName = name;
+            servletWrapper = new StandardWrapper(servletClassName,this);
+            this.servletClsMap.put(name, servletClassName);
+            this.servletInstanceMap.put(name, servletWrapper);
+        }
+        return servletWrapper;
     }
 
     @Override

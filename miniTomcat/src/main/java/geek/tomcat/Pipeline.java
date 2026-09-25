@@ -1,6 +1,7 @@
 package geek.tomcat;
 
 import java.io.IOException;
+import java.util.List;
 import javax.servlet.ServletException;
 
 /**
@@ -17,7 +18,7 @@ public interface Pipeline {
      //
      void addValve(Valve valve);
 
-     Valve[] getValves();
+     List<Valve> getValves();
 
      void removeValve(Valve valve);
 
