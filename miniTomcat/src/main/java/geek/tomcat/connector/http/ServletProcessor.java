@@ -2,9 +2,6 @@ package geek.tomcat.connector.http;
 
 import geek.tomcat.Request;
 import geek.tomcat.Response;
-import geek.tomcat.connector.http.HttpConnector;
-import geek.tomcat.connector.http.HttpRequestImpl;
-import geek.tomcat.connector.http.HttpResponseImpl;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.ServletException;

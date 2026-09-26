@@ -1,8 +1,6 @@
 package geek.tomcat.connector.http;
 
 import geek.tomcat.Constants;
-import geek.tomcat.connector.http.HttpRequestImpl;
-import geek.tomcat.connector.http.HttpResponseImpl;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 import java.io.File;

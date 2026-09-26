@@ -2,6 +2,7 @@ package geek.tomcat.startup;
 
 import geek.tomcat.Logger;
 import geek.tomcat.connector.http.HttpConnector;
+import geek.tomcat.core.ContainerListenerDef;
 import geek.tomcat.core.FilterDef;
 import geek.tomcat.core.FilterMap;
 import geek.tomcat.core.StandardContext;
@@ -42,6 +43,13 @@ public class Bootstrap {
         filterMap.setURLPattern("/*");
         container.addFilterMap(filterMap);
         container.filterStart();
+
+        ContainerListenerDef listenerDef = new ContainerListenerDef();
+        listenerDef.setListenerName("TestListener");
+        listenerDef.setListenerClass("test.TestListener");
+        container.addListenerDef(listenerDef);
+        container.listenerStart();
+        container.start();
         connector.start();
     }
 

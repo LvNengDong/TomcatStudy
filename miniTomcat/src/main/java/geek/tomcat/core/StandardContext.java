@@ -1,27 +1,19 @@
 package geek.tomcat.core;
 
 import geek.tomcat.*;
-import geek.tomcat.connector.HttpRequestFacade;
-import geek.tomcat.connector.HttpResponseFacade;
 import geek.tomcat.connector.http.HttpConnector;
-import geek.tomcat.connector.http.HttpRequestImpl;
+import org.apache.commons.collections4.CollectionUtils;
 
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLStreamHandler;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @Author lnd
@@ -38,12 +30,12 @@ public class StandardContext extends ContainerBase implements Context {
     Map<String, StandardWrapper> servletInstanceMap = new ConcurrentHashMap<>(); // servletName - servlet
 
     // 下面的属性记录了filter的配置
-    private Map<String,ApplicationFilterConfig> filterConfigs = new ConcurrentHashMap<>();
-    private Map<String,FilterDef> filterDefs = new ConcurrentHashMap<>();
+    private Map<String, ApplicationFilterConfig> filterConfigs = new ConcurrentHashMap<>();
+    private Map<String, FilterDef> filterDefs = new ConcurrentHashMap<>();
     private FilterMap filterMaps[] = new FilterMap[0];
 
-    //private ArrayList<ContainerListenerDef> listenerDefs = new ArrayList<>();
-    //private ArrayList<ContainerListener> listeners = new ArrayList<>();
+    private List<ContainerListenerDef> listenerDefs = new ArrayList<>();
+    private List<ContainerListener> listeners = new ArrayList<>();
 
     public StandardContext() {
         super();
@@ -298,5 +290,72 @@ public class StandardContext extends ContainerBase implements Context {
             return (true);
         else
             return (false);
+    }
+
+    // ===================================================================== Listener 相关
+    public void start() {
+        // 触发一个容器启动事件
+        fireContainerEvent("context.start", this);
+    }
+
+    private void fireContainerEvent(String type, Object data) {
+        // 检查是否已经有监听器，如果没有则直接返回
+        if (CollectionUtils.isEmpty(listeners)) {
+            return;
+        }
+        ContainerEvent event = new ContainerEvent(this, type, data);
+        ContainerListener list[] = new ContainerListener[0];
+        synchronized (listeners) {
+            list = (ContainerListener[]) listeners.toArray(list);
+        }
+        // 遍历所有监听器并触发事件
+        for (ContainerListener listener : list) {
+            listener.containerEvent(event);
+        }
+    }
+
+    public boolean listenerStart() {
+        System.out.println("Listener Start..........");
+        boolean ok = true;
+        synchronized (listeners) {
+            listeners.clear();
+            Iterator<ContainerListenerDef> defs = listenerDefs.iterator();
+            ContainerListener listener = null;
+            while (defs.hasNext()) {
+                try {
+                    ContainerListenerDef def = defs.next();
+                    String listenerClass = def.getListenerClass();
+                    loader = this.getLoader();
+                    ClassLoader oldCtxClassLoader = Thread.currentThread().getContextClassLoader();
+                    Class clazz = loader.loadClass(listenerClass);
+                    listener = (ContainerListener) clazz.newInstance();
+                    addContainerListener(listener);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    ok = false;
+                }
+            }
+        }
+        return ok;
+    }
+
+    public void addListenerDef(ContainerListenerDef listenerDef) {
+        synchronized (listenerDefs) {
+            listenerDefs.add(listenerDef);
+        }
+    }
+
+    public void addContainerListener(ContainerListener listener) {
+        // 添加一个新的容器监听器到监听器列表，并确保线程安全
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
+    }
+
+    public void removeContainerListener(ContainerListener listener) {
+        // 移除指定的容器监听器，并确保线程安全
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
     }
 }

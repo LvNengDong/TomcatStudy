@@ -1,14 +1,14 @@
 package geek.tomcat.core;
 
-import geek.tomcat.*;
-import geek.tomcat.connector.HttpRequestFacade;
-import geek.tomcat.connector.HttpResponseFacade;
+import geek.tomcat.Request;
+import geek.tomcat.Response;
+import geek.tomcat.ValveContext;
+import geek.tomcat.Wrapper;
 import geek.tomcat.connector.http.HttpRequestImpl;
 import geek.tomcat.valves.ValveBase;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.util.Objects;
 
 /**
  * @Author lnd

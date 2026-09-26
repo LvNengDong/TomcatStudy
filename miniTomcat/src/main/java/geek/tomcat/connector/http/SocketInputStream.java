@@ -1,8 +1,5 @@
 package geek.tomcat.connector.http;
 
-import geek.tomcat.connector.http.HttpHeader;
-import geek.tomcat.connector.http.HttpRequestLine;
-
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import java.io.IOException;

@@ -1,11 +1,17 @@
 package geek.tomcat.session;
 
 import geek.tomcat.Session;
+import geek.tomcat.SessionEvent;
+import geek.tomcat.SessionListener;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * @Author lnd
@@ -17,11 +23,8 @@ public class StandardSession implements HttpSession, Session {
     public void setCreationTime(long time) {
 
     }
-
-    @Override
-    public void setId(String id) {
-
-    }
+    @Getter@Setter
+    private String sessionid;
 
     @Override
     public String getInfo() {
@@ -146,5 +149,35 @@ public class StandardSession implements HttpSession, Session {
     @Override
     public boolean isNew() {
         return false;
+    }
+
+    // ==================================================监听器处理
+    private transient List<SessionListener> listeners = new ArrayList<>();
+
+    public void addSessionListener(SessionListener listener) {
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
+    }
+
+    public void removeSessionListener(SessionListener listener) {
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
+    }
+
+    public void fireSessionEvent(String type, Object data) {
+        if (listeners.size() < 1) return;
+        SessionEvent event = new SessionEvent(this, type, data);
+        SessionListener list[] = new SessionListener[0];
+        synchronized (listeners) {
+            list = (SessionListener[]) listeners.toArray(list);
+        }
+        for (int i = 0; i < list.length; i++) ((SessionListener) list[i]).sessionEvent(event);
+    }
+
+    public void setId(String sessionId) {
+        this.sessionid = sessionId;
+        fireSessionEvent(Session.SESSION_CREATED_EVENT, null);
     }
 }
